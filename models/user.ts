@@ -1,4 +1,5 @@
 import mongoose from "mongoose"
+import { connectToDatabase } from "../lib/mongodb"
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -42,6 +43,22 @@ const UserSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
       },
+      monthlyReports: {
+        type: Boolean,
+        default: false,
+      },
+      transactionAlerts: {
+        type: Boolean,
+        default: true,
+      },
+      savingsGoalAlerts: {
+        type: Boolean,
+        default: true,
+      },
+      accountActivityAlerts: {
+        type: Boolean,
+        default: true,
+      },
     },
   },
   lastLogin: {
@@ -52,5 +69,47 @@ const UserSchema = new mongoose.Schema({
 // Add index for faster queries
 UserSchema.index({ email: 1 })
 
-export const User = mongoose.models.User || mongoose.model("User", UserSchema)
+// Create a function to get the User model with an established connection
+export async function getUserModel() {
+  await connectToDatabase()
+  return mongoose.models.User || mongoose.model("User", UserSchema)
+}
+
+// For backward compatibility, still export the User model directly
+// but with a safer initialization
+let User: any
+try {
+  // Try to get the model if it exists
+  User = mongoose.models.User || mongoose.model("User", UserSchema)
+} catch (error) {
+  // If there's an error, we'll need to use the async function instead
+  User = {
+    findOne: async (...args: any[]) => {
+      const model = await getUserModel()
+      return model.findOne(...args)
+    },
+    findById: async (...args: any[]) => {
+      const model = await getUserModel()
+      return model.findById(...args)
+    },
+    find: async (...args: any[]) => {
+      const model = await getUserModel()
+      return model.find(...args)
+    },
+    create: async (...args: any[]) => {
+      const model = await getUserModel()
+      return model.create(...args)
+    },
+    updateOne: async (...args: any[]) => {
+      const model = await getUserModel()
+      return model.updateOne(...args)
+    },
+    deleteOne: async (...args: any[]) => {
+      const model = await getUserModel()
+      return model.deleteOne(...args)
+    }
+  }
+}
+
+export { User }
 

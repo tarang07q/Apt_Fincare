@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import { connectToDatabase } from "../../../../lib/mongodb"
 import { compare } from "bcryptjs"
 import { User } from "../../../../models/user"
+import { sendAccountActivityAlert } from "../../../../lib/notifications"
 
 export const authOptions = {
   providers: [
@@ -14,16 +15,39 @@ export const authOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          return null
+          throw new Error("Email and password are required")
         }
 
         await connectToDatabase()
+        // Use the getUserModel function to ensure we have a connection
         const user = await User.findOne({ email: credentials.email })
 
-        if (!user) return null
+        if (!user) {
+          throw new Error("No user found with this email")
+        }
 
         const isPasswordValid = await compare(credentials.password, user.password)
-        if (!isPasswordValid) return null
+        if (!isPasswordValid) {
+          throw new Error("Invalid password")
+        }
+
+        // Update last login time
+        user.lastLogin = new Date()
+        await user.save()
+
+        // Send account activity notification if enabled
+        try {
+          if (user.preferences?.notifications?.accountActivityAlerts) {
+            await sendAccountActivityAlert(
+              user._id.toString(),
+              "New Login",
+              `New login to your account at ${new Date().toLocaleString()}`
+            )
+          }
+        } catch (error) {
+          console.error("Failed to send login notification:", error)
+          // Don't fail the login if notification fails
+        }
 
         return {
           id: user._id.toString(),

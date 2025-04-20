@@ -81,7 +81,7 @@ export function TransactionFilters({ filters, onFilterChange, categories }: Tran
               <SelectValue placeholder="All Categories" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Categories</SelectItem>
+              <SelectItem value="all">All Categories</SelectItem>
               {categories.map((category) => (
                 <SelectItem key={category._id} value={category._id}>
                   <div className="flex items-center">
@@ -147,7 +147,7 @@ export function TransactionFilters({ filters, onFilterChange, categories }: Tran
           <div className="flex gap-2">
             <Select value={filters.sortBy} onValueChange={(value) => onFilterChange({ sortBy: value })}>
               <SelectTrigger className="flex-1">
-                <SelectValue />
+                <SelectValue placeholder="Date" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="date">Date</SelectItem>
@@ -157,7 +157,7 @@ export function TransactionFilters({ filters, onFilterChange, categories }: Tran
             </Select>
             <Select value={filters.sortOrder} onValueChange={(value) => onFilterChange({ sortOrder: value })}>
               <SelectTrigger className="w-24">
-                <SelectValue />
+                <SelectValue placeholder="Order" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="asc">Asc</SelectItem>

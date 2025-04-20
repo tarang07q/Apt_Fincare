@@ -1,6 +1,9 @@
 "use client"
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
+import { useCurrencyContext } from "../../components/currency-provider"
+import { useEffect } from "react"
+import { useToast } from "../../components/ui/use-toast"
 
 const currencies = [
   { code: "USD", name: "US Dollar ($)", symbol: "$" },
@@ -31,8 +34,43 @@ type CurrencySelectorProps = {
 }
 
 export function CurrencySelector({ value, onValueChange }: CurrencySelectorProps) {
+  const { currency, setCurrency } = useCurrencyContext()
+  const { toast } = useToast()
+
+  // Log current values for debugging
+  useEffect(() => {
+    console.log("CurrencySelector - Props value:", value)
+    console.log("CurrencySelector - Context currency:", currency)
+  }, [value, currency])
+
+  // When the value changes, update the global currency context
+  useEffect(() => {
+    if (value && value !== currency) {
+      console.log("Updating currency context to:", value)
+      setCurrency(value)
+      // Force update localStorage
+      localStorage.setItem("currency", value)
+    }
+  }, [value, setCurrency, currency])
+
+  // Handle value change
+  const handleValueChange = (newValue: string) => {
+    console.log("Currency selection changed to:", newValue)
+    onValueChange(newValue)
+    setCurrency(newValue)
+    // Force update localStorage
+    localStorage.setItem("currency", newValue)
+
+    // Show confirmation toast
+    toast({
+      title: "Currency updated",
+      description: `Your currency has been changed to ${newValue}. All amounts will now be displayed in this currency.`,
+      variant: "default",
+    })
+  }
+
   return (
-    <Select value={value} onValueChange={onValueChange}>
+    <Select value={value} onValueChange={handleValueChange}>
       <SelectTrigger className="w-full">
         <SelectValue placeholder="Select currency" />
       </SelectTrigger>

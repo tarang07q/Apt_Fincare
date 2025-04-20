@@ -1,0 +1,162 @@
+/* Login page specific styles */
+.login-container {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to right, #f0fdf4, #dcfce7);
+}
+
+.dark .login-container {
+  background: linear-gradient(to right, #1f2937, #111827);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 28rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.login-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem;
+}
+
+.login-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.login-logo-icon {
+  height: 1.5rem;
+  width: 1.5rem;
+  color: #10b981;
+}
+
+.login-logo-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.login-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.login-description {
+  text-align: center;
+  color: #6b7280;
+}
+
+.login-form {
+  padding: 1rem 1.5rem;
+}
+
+.login-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.login-error {
+  background-color: #fef2f2;
+  padding: 1rem;
+  border-radius: 0.375rem;
+}
+
+.dark .login-error {
+  background-color: rgba(220, 38, 38, 0.2);
+}
+
+.login-error-text {
+  font-size: 0.875rem;
+  color: #b91c1c;
+}
+
+.dark .login-error-text {
+  color: #fca5a5;
+}
+
+.login-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.login-input-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.login-forgot-link {
+  font-size: 0.875rem;
+  color: #10b981;
+}
+
+.login-forgot-link:hover {
+  color: #059669;
+}
+
+.dark .login-forgot-link {
+  color: #34d399;
+}
+
+.dark .login-forgot-link:hover {
+  color: #10b981;
+}
+
+.login-button {
+  width: 100%;
+  background-color: #10b981;
+  color: white;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  transition: background-color 0.2s;
+}
+
+.login-button:hover {
+  background-color: #059669;
+}
+
+.login-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.login-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+}
+
+.login-signup-text {
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.login-signup-link {
+  color: #10b981;
+}
+
+.login-signup-link:hover {
+  color: #059669;
+}
+
+.dark .login-signup-link {
+  color: #34d399;
+}
+
+.dark .login-signup-link:hover {
+  color: #10b981;
+}

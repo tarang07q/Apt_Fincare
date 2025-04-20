@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../..
 import { useToast } from "../../hooks/use-toast"
 import { Progress } from "../ui/progress"
 import { AlertTriangle } from "lucide-react"
+import { useCurrency } from "../../hooks/useCurrency"
 
 type Budget = {
   _id: string
@@ -25,18 +26,21 @@ type Budget = {
 
 export function BudgetProgress() {
   const { toast } = useToast()
+  const { currency, currencySymbol, formatCurrency } = useCurrency()
   const [isLoading, setIsLoading] = useState(true)
   const [budgets, setBudgets] = useState<Budget[]>([])
 
+  // Fetch budgets when component mounts or currency changes
   useEffect(() => {
     const fetchBudgets = async () => {
       try {
-        const response = await fetch("/api/budgets/progress")
+        setIsLoading(true)
+        const response = await fetch(`/api/budgets/progress?currency=${currency}`)
         if (!response.ok) {
           throw new Error("Failed to fetch budgets")
         }
-        const data = await response.json()
-        setBudgets(data)
+        const result = await response.json()
+        setBudgets(result.data || [])
       } catch (error) {
         toast({
           title: "Error",
@@ -49,77 +53,7 @@ export function BudgetProgress() {
     }
 
     fetchBudgets()
-  }, [toast])
-
-  // Sample data for development
-  const sampleBudgets = [
-    {
-      _id: "1",
-      category: {
-        _id: "cat1",
-        name: "Groceries",
-        icon: "shopping-cart",
-        color: "#10b981",
-      },
-      amount: 500,
-      spent: 320,
-      period: "monthly",
-      alerts: {
-        enabled: true,
-        threshold: 80,
-      },
-    },
-    {
-      _id: "2",
-      category: {
-        _id: "cat2",
-        name: "Entertainment",
-        icon: "film",
-        color: "#f59e0b",
-      },
-      amount: 200,
-      spent: 185,
-      period: "monthly",
-      alerts: {
-        enabled: true,
-        threshold: 80,
-      },
-    },
-    {
-      _id: "3",
-      category: {
-        _id: "cat3",
-        name: "Transportation",
-        icon: "car",
-        color: "#6366f1",
-      },
-      amount: 300,
-      spent: 150,
-      period: "monthly",
-      alerts: {
-        enabled: true,
-        threshold: 80,
-      },
-    },
-    {
-      _id: "4",
-      category: {
-        _id: "cat4",
-        name: "Dining Out",
-        icon: "utensils",
-        color: "#ef4444",
-      },
-      amount: 250,
-      spent: 230,
-      period: "monthly",
-      alerts: {
-        enabled: true,
-        threshold: 80,
-      },
-    },
-  ] as Budget[]
-
-  const data = isLoading || budgets.length === 0 ? sampleBudgets : budgets
+  }, [currency, toast])
 
   return (
     <Card>
@@ -140,13 +74,13 @@ export function BudgetProgress() {
               </div>
             ))}
           </div>
-        ) : data.length === 0 ? (
+        ) : budgets.length === 0 ? (
           <div className="py-12 text-center">
             <p className="text-muted-foreground">No budgets found</p>
           </div>
         ) : (
           <div className="space-y-6">
-            {data.map((budget) => {
+            {budgets.map((budget) => {
               const percentage = Math.round((budget.spent / budget.amount) * 100)
               const isNearLimit = percentage >= budget.alerts.threshold
               const isOverBudget = percentage > 100
@@ -162,7 +96,7 @@ export function BudgetProgress() {
                       )}
                     </div>
                     <div className="text-sm">
-                      ${budget.spent.toFixed(2)} / ${budget.amount.toFixed(2)}
+                      {formatCurrency(budget.spent)} / {formatCurrency(budget.amount)}
                     </div>
                   </div>
                   <Progress

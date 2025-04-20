@@ -22,6 +22,12 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // Add asset prefix for static files
+  assetPrefix: process.env.NODE_ENV === 'production' ? undefined : '',
+  // Ensure CSS modules work correctly
+  webpack: (config) => {
+    return config;
+  },
   experimental: {
     webpackBuildWorker: true,
     parallelServerBuildTraces: true,

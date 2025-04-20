@@ -1,4 +1,5 @@
 import mongoose from "mongoose"
+import { connectToDatabase } from "../lib/mongodb"
 
 const BudgetSchema = new mongoose.Schema({
   userId: {
@@ -87,5 +88,55 @@ BudgetSchema.pre("save", function (next) {
   next()
 })
 
-export const Budget = mongoose.models.Budget || mongoose.model("Budget", BudgetSchema)
+// Create a function to get the Budget model with an established connection
+export async function getBudgetModel() {
+  await connectToDatabase()
+  return mongoose.models.Budget || mongoose.model("Budget", BudgetSchema)
+}
+
+// For backward compatibility, still export the Budget model directly
+// but with a safer initialization
+let Budget: any
+try {
+  // Try to get the model if it exists
+  Budget = mongoose.models.Budget || mongoose.model("Budget", BudgetSchema)
+} catch (error) {
+  // If there's an error, we'll need to use the async function instead
+  Budget = {
+    findOne: async (...args: any[]) => {
+      const model = await getBudgetModel()
+      return model.findOne(...args)
+    },
+    findById: async (...args: any[]) => {
+      const model = await getBudgetModel()
+      return model.findById(...args)
+    },
+    find: async (...args: any[]) => {
+      const model = await getBudgetModel()
+      return model.find(...args)
+    },
+    create: async (...args: any[]) => {
+      const model = await getBudgetModel()
+      return model.create(...args)
+    },
+    updateOne: async (...args: any[]) => {
+      const model = await getBudgetModel()
+      return model.updateOne(...args)
+    },
+    deleteOne: async (...args: any[]) => {
+      const model = await getBudgetModel()
+      return model.deleteOne(...args)
+    },
+    findByIdAndUpdate: async (...args: any[]) => {
+      const model = await getBudgetModel()
+      return model.findByIdAndUpdate(...args)
+    },
+    aggregate: async (...args: any[]) => {
+      const model = await getBudgetModel()
+      return model.aggregate(...args)
+    }
+  }
+}
+
+export { Budget }
 

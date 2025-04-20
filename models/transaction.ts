@@ -1,4 +1,5 @@
 import mongoose from "mongoose"
+import { connectToDatabase } from "../lib/mongodb"
 
 const TransactionSchema = new mongoose.Schema({
   userId: {
@@ -62,6 +63,13 @@ const TransactionSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+  originalCurrency: {
+    type: String,
+    default: "USD",
+  },
+  originalAmount: {
+    type: Number,
+  },
   attachments: [
     {
       name: String,
@@ -90,5 +98,55 @@ TransactionSchema.pre("save", function (next) {
   next()
 })
 
-export const Transaction = mongoose.models.Transaction || mongoose.model("Transaction", TransactionSchema)
+// Create a function to get the Transaction model with an established connection
+export async function getTransactionModel() {
+  await connectToDatabase()
+  return mongoose.models.Transaction || mongoose.model("Transaction", TransactionSchema)
+}
+
+// For backward compatibility, still export the Transaction model directly
+// but with a safer initialization
+let Transaction: any
+try {
+  // Try to get the model if it exists
+  Transaction = mongoose.models.Transaction || mongoose.model("Transaction", TransactionSchema)
+} catch (error) {
+  // If there's an error, we'll need to use the async function instead
+  Transaction = {
+    findOne: async (...args: any[]) => {
+      const model = await getTransactionModel()
+      return model.findOne(...args)
+    },
+    findById: async (...args: any[]) => {
+      const model = await getTransactionModel()
+      return model.findById(...args)
+    },
+    find: async (...args: any[]) => {
+      const model = await getTransactionModel()
+      return model.find(...args)
+    },
+    create: async (...args: any[]) => {
+      const model = await getTransactionModel()
+      return model.create(...args)
+    },
+    updateOne: async (...args: any[]) => {
+      const model = await getTransactionModel()
+      return model.updateOne(...args)
+    },
+    deleteOne: async (...args: any[]) => {
+      const model = await getTransactionModel()
+      return model.deleteOne(...args)
+    },
+    findByIdAndUpdate: async (...args: any[]) => {
+      const model = await getTransactionModel()
+      return model.findByIdAndUpdate(...args)
+    },
+    aggregate: async (...args: any[]) => {
+      const model = await getTransactionModel()
+      return model.aggregate(...args)
+    }
+  }
+}
+
+export { Transaction }
 

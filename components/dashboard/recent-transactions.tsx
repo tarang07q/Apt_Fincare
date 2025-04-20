@@ -8,6 +8,8 @@ import { Input } from "../../components/ui/input"
 import { Button } from "../../components/ui/button"
 import { format } from "date-fns"
 import { Badge } from "../../components/ui/badge"
+import { useCurrency } from "../../hooks/useCurrency"
+import { useRouter } from "next/navigation"
 
 type Transaction = {
   _id: string
@@ -25,19 +27,23 @@ type Transaction = {
 
 export function RecentTransactions() {
   const { toast } = useToast()
+  const router = useRouter()
+  const { currency, currencySymbol, formatCurrency } = useCurrency()
   const [isLoading, setIsLoading] = useState(true)
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [searchQuery, setSearchQuery] = useState("")
 
+  // Fetch transactions when component mounts or currency changes
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const response = await fetch("/api/transactions/recent")
+        setIsLoading(true)
+        const response = await fetch(`/api/transactions/recent?currency=${currency}`)
         if (!response.ok) {
           throw new Error("Failed to fetch transactions")
         }
-        const data = await response.json()
-        setTransactions(data)
+        const result = await response.json()
+        setTransactions(result.transactions || [])
       } catch (error) {
         toast({
           title: "Error",
@@ -50,80 +56,9 @@ export function RecentTransactions() {
     }
 
     fetchTransactions()
-  }, [toast])
+  }, [currency, toast])
 
-  // Sample data for development
-  const sampleTransactions = [
-    {
-      _id: "1",
-      amount: 120.5,
-      type: "expense",
-      category: {
-        _id: "cat1",
-        name: "Groceries",
-        icon: "shopping-cart",
-        color: "#10b981",
-      },
-      description: "Weekly grocery shopping",
-      date: "2023-04-01T12:00:00Z",
-    },
-    {
-      _id: "2",
-      amount: 2500.0,
-      type: "income",
-      category: {
-        _id: "cat2",
-        name: "Salary",
-        icon: "briefcase",
-        color: "#3b82f6",
-      },
-      description: "Monthly salary",
-      date: "2023-04-01T10:00:00Z",
-    },
-    {
-      _id: "3",
-      amount: 45.99,
-      type: "expense",
-      category: {
-        _id: "cat3",
-        name: "Entertainment",
-        icon: "film",
-        color: "#f59e0b",
-      },
-      description: "Movie tickets",
-      date: "2023-03-28T18:30:00Z",
-    },
-    {
-      _id: "4",
-      amount: 35.0,
-      type: "expense",
-      category: {
-        _id: "cat4",
-        name: "Transportation",
-        icon: "car",
-        color: "#6366f1",
-      },
-      description: "Fuel",
-      date: "2023-03-27T09:15:00Z",
-    },
-    {
-      _id: "5",
-      amount: 200.0,
-      type: "income",
-      category: {
-        _id: "cat5",
-        name: "Freelance",
-        icon: "laptop",
-        color: "#8b5cf6",
-      },
-      description: "Website design project",
-      date: "2023-03-25T14:20:00Z",
-    },
-  ] as Transaction[]
-
-  const data = isLoading || transactions.length === 0 ? sampleTransactions : transactions
-
-  const filteredTransactions = data.filter(
+  const filteredTransactions = transactions.filter(
     (transaction) =>
       transaction.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
       transaction.category.name.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -193,12 +128,12 @@ export function RecentTransactions() {
                   </div>
                 </div>
                 <div className={`font-medium ${transaction.type === "expense" ? "text-rose-500" : "text-emerald-500"}`}>
-                  {transaction.type === "expense" ? "-" : "+"}${transaction.amount.toFixed(2)}
+                  {transaction.type === "expense" ? "-" : "+"}{formatCurrency(transaction.amount)}
                 </div>
               </div>
             ))}
             <div className="pt-4 text-center">
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={() => router.push('/dashboard/transactions')}>
                 View All Transactions
               </Button>
             </div>

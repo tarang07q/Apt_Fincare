@@ -8,11 +8,15 @@ import { RecentTransactions } from "../../components/dashboard/recent-transactio
 import { BudgetProgress } from "../../components/dashboard/budget-progress"
 import { useSession } from "next-auth/react"
 import { useToast } from "../../components/ui/use-toast"
-import { ArrowDownIcon, ArrowUpIcon, DollarSign } from "lucide-react"
+import { useCurrency } from "../../hooks/useCurrency"
+import { useApi } from "../../hooks/useApi"
+import { ThreeDIcon } from "../../components/ui/3d-icon"
 
 export default function DashboardPage() {
   const { data: session } = useSession()
   const { toast } = useToast()
+  const { formatCurrency } = useCurrency()
+  const { fetchWithCurrency } = useApi()
   const [isLoading, setIsLoading] = useState(true)
   const [summary, setSummary] = useState({
     totalIncome: 0,
@@ -21,27 +25,45 @@ export default function DashboardPage() {
   })
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchSummary = async () => {
+      if (!isMounted) return;
+
       try {
-        const response = await fetch("/api/transactions/summary")
-        if (!response.ok) {
-          throw new Error("Failed to fetch summary data")
+        setIsLoading(true)
+        const response = await fetchWithCurrency("/api/transactions/summary")
+        if (isMounted && response) {
+          // Type assertion for the response
+          const data = response as any;
+          setSummary({
+            totalIncome: data.totalIncome || 0,
+            totalExpenses: data.totalExpenses || 0,
+            balance: data.balance || 0
+          })
         }
-        const data = await response.json()
-        setSummary(data)
       } catch (error) {
-        toast({
-          title: "Error",
-          description: "Failed to load financial summary",
-          variant: "destructive",
-        })
+        if (isMounted) {
+          toast({
+            title: "Error",
+            description: "Failed to load financial summary",
+            variant: "destructive",
+          })
+        }
       } finally {
-        setIsLoading(false)
+        if (isMounted) {
+          setIsLoading(false)
+        }
       }
     }
 
     fetchSummary()
-  }, [toast])
+
+    // Cleanup function to prevent state updates after unmount
+    return () => {
+      isMounted = false;
+    };
+  }, [toast, fetchWithCurrency])
 
   return (
     <div className="flex flex-col gap-4">
@@ -52,49 +74,49 @@ export default function DashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Balance</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <ThreeDIcon icon="solar:wallet-money-bold-duotone" size={28} color="#6366f1" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {isLoading ? (
                 <div className="h-8 w-24 animate-pulse rounded bg-muted"></div>
               ) : (
-                `$${summary.balance.toFixed(2)}`
+                formatCurrency(summary.balance)
               )}
             </div>
-            <p className="text-xs text-muted-foreground">Your current financial balance</p>
+            <p className="text-xs text-muted-foreground">Your financial balance for 2025</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Income</CardTitle>
-            <ArrowUpIcon className="h-4 w-4 text-emerald-500" />
+            <ThreeDIcon icon="solar:money-bag-bold-duotone" size={28} color="#10b981" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {isLoading ? (
                 <div className="h-8 w-24 animate-pulse rounded bg-muted"></div>
               ) : (
-                `$${summary.totalIncome.toFixed(2)}`
+                formatCurrency(summary.totalIncome)
               )}
             </div>
-            <p className="text-xs text-muted-foreground">Total income this month</p>
+            <p className="text-xs text-muted-foreground">Total income for 2025</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Expenses</CardTitle>
-            <ArrowDownIcon className="h-4 w-4 text-rose-500" />
+            <ThreeDIcon icon="solar:card-transfer-bold-duotone" size={28} color="#ef4444" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {isLoading ? (
                 <div className="h-8 w-24 animate-pulse rounded bg-muted"></div>
               ) : (
-                `$${summary.totalExpenses.toFixed(2)}`
+                formatCurrency(summary.totalExpenses)
               )}
             </div>
-            <p className="text-xs text-muted-foreground">Total expenses this month</p>
+            <p className="text-xs text-muted-foreground">Total expenses for 2025</p>
           </CardContent>
         </Card>
       </div>

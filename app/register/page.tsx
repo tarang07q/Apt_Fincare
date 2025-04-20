@@ -21,10 +21,35 @@ export default function RegisterPage() {
   const router = useRouter()
   const { toast } = useToast()
 
+  const [errorMessage, setErrorMessage] = useState<string>("");
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setErrorMessage("") // Clear any previous errors
+
+    // Validate inputs
+    if (!name.trim()) {
+      setErrorMessage("Name is required")
+      return
+    }
+
+    if (!email.trim()) {
+      setErrorMessage("Email is required")
+      return
+    }
+
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      setErrorMessage("Please enter a valid email address")
+      return
+    }
+
+    if (password.length < 6) {
+      setErrorMessage("Password must be at least 6 characters long")
+      return
+    }
 
     if (password !== confirmPassword) {
+      setErrorMessage("Passwords don't match")
       toast({
         title: "Passwords don't match",
         description: "Please make sure your passwords match.",
@@ -51,6 +76,7 @@ export default function RegisterPage() {
       const data = await response.json()
 
       if (!response.ok) {
+        setErrorMessage(data.message || "Registration failed")
         throw new Error(data.message || "Registration failed")
       }
 
@@ -84,6 +110,11 @@ export default function RegisterPage() {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
+            {errorMessage && (
+              <div className="rounded-md bg-red-50 p-4 dark:bg-red-900/20">
+                <p className="text-sm text-red-800 dark:text-red-200">{errorMessage}</p>
+              </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
               <Input id="name" placeholder="Enter your name" value={name} onChange={(e) => setName(e.target.value)} required />
@@ -107,7 +138,9 @@ export default function RegisterPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                minLength={6}
               />
+              <p className="text-xs text-gray-500">Password must be at least 6 characters long</p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirm-password">Confirm Password</Label>

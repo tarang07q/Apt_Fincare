@@ -3,9 +3,12 @@ import { getServerSession } from "next-auth/next"
 import { connectToDatabase } from "../../../../lib/mongodb"
 import { Budget } from "../../../../models/budget"
 import { Transaction } from "../../../../models/transaction"
+import { User } from "../../../../models/user"
 import { authOptions } from "../../auth/[...nextauth]/route"
+import { convertCurrency } from "../../../../lib/currency"
+import { sendBudgetAlert } from "../../../../lib/notifications"
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions)
 
@@ -13,8 +16,20 @@ export async function GET() {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
     }
 
+    // Get currency from query parameters
+    const { searchParams } = new URL(request.url)
+    let currency = searchParams.get("currency") || "USD"
+
     // Connect to database
     await connectToDatabase()
+
+    // If no currency specified, get user's preferred currency
+    if (!searchParams.has("currency")) {
+      const user = await User.findById(session.user.id)
+      if (user?.preferences?.currency) {
+        currency = user.preferences.currency
+      }
+    }
 
     // Get current date
     const now = new Date()
@@ -96,24 +111,59 @@ export async function GET() {
         // Calculate percentage and status
         const percentage = Math.round((spent / budget.amount) * 100)
         let status = "on-track"
+        let shouldSendAlert = false
 
         if (percentage >= 100) {
           status = "over-budget"
+          shouldSendAlert = true
         } else if (percentage >= budget.alerts.threshold) {
           status = "warning"
+          shouldSendAlert = true
         }
+
+        // Send budget alert if needed
+        if (shouldSendAlert && budget.alerts?.enabled !== false) {
+          try {
+            const budgetName = budget.category.name || 'Budget';
+            await sendBudgetAlert(
+              session.user.id,
+              budgetName,
+              spent,
+              budget.amount,
+              currency
+            );
+          } catch (alertError) {
+            console.error('Failed to send budget alert:', alertError);
+            // Don't fail the request if alert fails
+          }
+        }
+
+        // Calculate remaining budget (can be negative if over budget)
+        const remaining = budget.amount - spent
 
         return {
           ...budget.toObject(),
           spent,
           percentage,
           status,
-          remaining: Math.max(0, budget.amount - spent),
+          remaining,
         }
       }),
     )
 
-    return NextResponse.json(budgetsWithProgress)
+    // Convert all monetary values to the requested currency
+    if (currency !== "USD") {
+      budgetsWithProgress.forEach(budget => {
+        budget.amount = Number(convertCurrency(budget.amount, currency).toFixed(2))
+        budget.spent = Number(convertCurrency(budget.spent, currency).toFixed(2))
+        budget.remaining = Number(convertCurrency(budget.remaining, currency).toFixed(2))
+      })
+    }
+
+    return NextResponse.json({
+      data: budgetsWithProgress,
+      currency: currency
+    })
   } catch (error) {
     console.error("Budget progress error:", error)
     return NextResponse.json({ message: "An error occurred while fetching budget progress" }, { status: 500 })

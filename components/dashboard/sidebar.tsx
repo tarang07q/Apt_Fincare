@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { signOut } from "next-auth/react"
-import { BarChart3, CreditCard, Home, LogOut, PiggyBank, Settings, Wallet } from "lucide-react"
+import { BarChart3, Bell, CreditCard, Home, LogOut, PiggyBank, Settings, Wallet } from "lucide-react"
 import { Button } from "../../components/ui/button"
 import { cn } from "../../lib/utils"
 
@@ -27,6 +27,11 @@ const navItems = [
     title: "Analytics",
     href: "/dashboard/analytics",
     icon: BarChart3,
+  },
+  {
+    title: "Notifications",
+    href: "/dashboard/notifications",
+    icon: Bell,
   },
   {
     title: "Settings",

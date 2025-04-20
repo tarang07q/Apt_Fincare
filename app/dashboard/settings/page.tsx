@@ -11,14 +11,14 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { Form, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "../../../components/ui/form"
-import { CurrencySelector } from "../../../components/settings/currency-selector"
+import { FixedCurrencySelector } from "../../../components/settings/fixed-currency-selector"
 import { ThemeSelector } from "../../../components/settings/theme-selector"
 import { NotificationSettings } from "../../../components/settings/notification-settings"
 import { ExportData } from "../../../components/settings/export-data"
 import { DeleteAccount } from "../../../components/settings/delete-account"
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "../../../app/api/auth/[...nextauth]/route"
-import { NextResponse } from "next/server"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useTheme } from "next-themes"
+import { useCurrencyContext } from "../../../components/currency-provider"
 
 const preferencesFormSchema = z.object({
   currency: z.string().min(1, "Currency is required"),
@@ -29,19 +29,31 @@ const preferencesFormSchema = z.object({
   }),
 })
 
-export default async function SettingsPage() {
+export default function SettingsPage() {
   const { toast } = useToast()
+  const { data: session, status } = useSession()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const { setTheme, theme } = useTheme()
+  const { currency, setCurrency } = useCurrencyContext()
+
+  // Get the tab from URL query parameters
+  const tabParam = searchParams.get('tab')
+
+  // Debug current currency and theme
+  useEffect(() => {
+    console.log("Settings page - Current currency:", currency)
+    console.log("Settings page - Current theme:", theme)
+  }, [currency, theme])
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [userPreferences, setUserPreferences] = useState(null)
-  const [currency, setCurrency] = useState("USD")
-  const [theme, setTheme] = useState("system")
 
   const preferencesForm = useForm<z.infer<typeof preferencesFormSchema>>({
     resolver: zodResolver(preferencesFormSchema),
     defaultValues: {
-      currency: "USD",
-      theme: "system",
+      currency: currency || "USD",
+      theme: theme || "system",
       notifications: {
         budgetAlerts: true,
         weeklyReports: true,
@@ -49,57 +61,105 @@ export default async function SettingsPage() {
     },
   })
 
-  const session = (await getServerSession(authOptions as any)) as { user?: { id: string } } | null;
-  const userId = session?.user?.id;
+  // Check if user is authenticated
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login")
+    }
+  }, [status, router])
 
-  if (!userId) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-  }
+  const userId = session?.user?.id
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchUserPreferences = async () => {
+      if (!userId) {
+        if (isMounted) setIsLoading(false)
+        return
+      }
+
       try {
         const response = await fetch(`/api/users/${userId}/preferences`)
         if (!response.ok) {
           throw new Error("Failed to fetch user preferences")
         }
         const data = await response.json()
-        setUserPreferences(data)
 
-        preferencesForm.reset({
-          currency: data.currency || "USD",
-          theme: data.theme || "system",
-          notifications: {
-            budgetAlerts: data.notifications?.budgetAlerts ?? true,
-            weeklyReports: data.notifications?.weeklyReports ?? true,
-          },
-        })
+        if (isMounted) {
+          setUserPreferences(data)
+
+          // Use the current theme and currency from providers as fallbacks
+          preferencesForm.reset({
+            currency: data.currency || currency || "USD",
+            theme: data.theme || theme || "system",
+            notifications: {
+              budgetAlerts: data.notifications?.budgetAlerts ?? true,
+              weeklyReports: data.notifications?.weeklyReports ?? true,
+            },
+          })
+        }
       } catch (error) {
-        toast({
-          title: "Error",
-          description: "Failed to load user preferences",
-          variant: "destructive",
-        })
+        if (isMounted) {
+          // If there's an error, still initialize the form with current theme and currency
+          preferencesForm.reset({
+            currency: currency || "USD",
+            theme: theme || "system",
+            notifications: {
+              budgetAlerts: true,
+              weeklyReports: true,
+            },
+          })
+
+          toast({
+            title: "Error",
+            description: "Failed to load user preferences",
+            variant: "destructive",
+          })
+        }
       } finally {
-        setIsLoading(false)
+        if (isMounted) {
+          setIsLoading(false)
+        }
       }
     }
 
     fetchUserPreferences()
-  }, [userId, toast, preferencesForm])
 
-  useEffect(() => {
-    localStorage.setItem('currency', currency);
-  }, [currency]);
+    return () => {
+      isMounted = false;
+    };
+  }, [userId, toast, preferencesForm, currency, theme])
 
-  useEffect(() => {
-    localStorage.setItem('theme', theme);
-    setTheme(theme);
-  }, [theme]);
+  // Theme and currency are now handled by their respective providers
 
   const onPreferencesSubmit = async (values: z.infer<typeof preferencesFormSchema>) => {
+    if (!userId) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to update preferences",
+        variant: "destructive",
+      })
+      return
+    }
+
     setIsSaving(true)
     try {
+      // Get the current currency from localStorage or context
+      const currentCurrency = localStorage.getItem("currency") || currency || "USD"
+
+      // Update theme in provider
+      console.log("Saving preferences - Theme:", values.theme)
+      console.log("Using current currency:", currentCurrency)
+
+      setTheme(values.theme)
+
+      // Force update localStorage for theme
+      localStorage.setItem("theme", values.theme)
+
+      // Use the current currency instead of form value
+      values.currency = currentCurrency
+
       const response = await fetch(`/api/users/${userId}/preferences`, {
         method: "PUT",
         headers: {
@@ -127,6 +187,20 @@ export default async function SettingsPage() {
     }
   }
 
+  // Show loading state while checking authentication
+  if (status === "loading") {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    )
+  }
+
+  // If not authenticated, don't render anything (redirect happens in useEffect)
+  if (status === "unauthenticated") {
+    return null
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -134,7 +208,7 @@ export default async function SettingsPage() {
         <p className="text-muted-foreground">Manage your application settings and preferences</p>
       </div>
 
-      <Tabs defaultValue="preferences" className="space-y-4">
+      <Tabs defaultValue={tabParam === 'notifications' ? 'notifications' : tabParam === 'data' ? 'data' : 'preferences'} className="space-y-4">
         <TabsList>
           <TabsTrigger value="preferences">Preferences</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
@@ -155,18 +229,11 @@ export default async function SettingsPage() {
               ) : (
                 <Form {...preferencesForm}>
                   <form onSubmit={preferencesForm.handleSubmit(onPreferencesSubmit)} className="space-y-6">
-                    <FormField
-                      control={preferencesForm.control}
-                      name="currency"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Currency</FormLabel>
-                          <CurrencySelector value={field.value} onValueChange={field.onChange} />
-                          <FormDescription>Select the currency to use for displaying amounts</FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <FormItem>
+                      <FormLabel>Currency</FormLabel>
+                      <FixedCurrencySelector />
+                      <FormDescription>Select the currency to use for displaying amounts</FormDescription>
+                    </FormItem>
 
                     <FormField
                       control={preferencesForm.control}
@@ -174,7 +241,16 @@ export default async function SettingsPage() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Theme</FormLabel>
-                          <ThemeSelector value={field.value} onValueChange={field.onChange} />
+                          <ThemeSelector
+                            value={field.value}
+                            onValueChange={(value) => {
+                              field.onChange(value);
+                              // Directly update the theme context and localStorage
+                              setTheme(value);
+                              localStorage.setItem("theme", value);
+                              console.log("Theme directly changed to:", value);
+                            }}
+                          />
                           <FormDescription>Choose your preferred theme</FormDescription>
                           <FormMessage />
                         </FormItem>

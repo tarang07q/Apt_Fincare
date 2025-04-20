@@ -113,6 +113,40 @@ export function TransactionList({ transactions, isLoading, onRefresh }: Transact
 
   return (
     <>
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the transaction.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-rose-500 hover:bg-rose-600">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Transaction</DialogTitle>
+          </DialogHeader>
+          {selectedTransaction && (
+            <EditTransactionForm
+              transaction={selectedTransaction}
+              onSuccess={() => {
+                setEditDialogOpen(false)
+                onRefresh()
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
       <div className="divide-y">
         {transactions.map((transaction) => (
           <div key={transaction._id} className="flex items-center gap-4 p-4">

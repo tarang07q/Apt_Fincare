@@ -9,6 +9,7 @@ import { Input } from "../../components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "../../components/ui/sheet"
 import { DashboardSidebar } from "./sidebar"
 import { ThemeToggle } from "../../components/theme-toggle"
+import { NotificationBell } from "../../components/ui/notification-bell"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -56,7 +57,10 @@ export function DashboardHeader() {
       <div className="w-full flex-1">
         <p className="text-center text-sm italic text-gray-500">"A budget is telling your money where to go instead of wondering where it went."</p>
       </div>
-      <ThemeToggle />
+      <div className="flex items-center gap-2">
+        <NotificationBell />
+        <ThemeToggle />
+      </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="rounded-full">
@@ -73,6 +77,9 @@ export function DashboardHeader() {
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/dashboard/settings">Settings</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/dashboard/settings?tab=notifications">Notification Settings</Link>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

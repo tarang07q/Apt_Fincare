@@ -16,6 +16,7 @@ import {
   Search,
   FlipHorizontalIcon as SwitchHorizontal,
 } from "lucide-react"
+import { ThreeDIcon } from "../../../components/ui/3d-icon"
 import { Tabs, TabsList, TabsTrigger } from "../../../components/ui/tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../../components/ui/dialog"
 import { AddTransactionForm } from "../../../components/transactions/add-transaction-form"
@@ -97,7 +98,7 @@ export default function TransactionsPage() {
       params.append("skip", skip.toString())
 
       if (filters.type) params.append("type", filters.type)
-      if (filters.category) params.append("category", filters.category)
+      if (filters.category && filters.category !== 'all') params.append("category", filters.category)
       if (filters.startDate) params.append("startDate", filters.startDate)
       if (filters.endDate) params.append("endDate", filters.endDate)
       if (filters.search) params.append("search", filters.search)
@@ -153,13 +154,49 @@ export default function TransactionsPage() {
     }
   }
 
-  const handleLoadMore = () => {
-    setPagination((prev) => ({
-      ...prev,
-      skip: prev.skip + prev.limit,
-    }))
+  const handleLoadMore = async () => {
+    const newSkip = pagination.skip + pagination.limit
 
-    fetchTransactions(false)
+    // Build query string from filters
+    const params = new URLSearchParams()
+    params.append("limit", pagination.limit.toString())
+    params.append("skip", newSkip.toString())
+
+    if (filters.type) params.append("type", filters.type)
+    if (filters.category && filters.category !== 'all') params.append("category", filters.category)
+    if (filters.startDate) params.append("startDate", filters.startDate)
+    if (filters.endDate) params.append("endDate", filters.endDate)
+    if (filters.search) params.append("search", filters.search)
+    params.append("sortBy", filters.sortBy)
+    params.append("sortOrder", filters.sortOrder)
+
+    setIsLoading(true)
+    try {
+      const response = await fetch(`/api/transactions?${params.toString()}`)
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch more transactions")
+      }
+
+      const data = await response.json()
+
+      // Append new transactions to existing ones
+      setTransactions((prev) => [...prev, ...data.transactions])
+
+      // Update pagination
+      setPagination({
+        ...data.pagination,
+        skip: newSkip
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load more transactions",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleRefresh = () => {
@@ -176,7 +213,7 @@ export default function TransactionsPage() {
       // Build query string from filters
       const params = new URLSearchParams()
       if (filters.type) params.append("type", filters.type)
-      if (filters.category) params.append("category", filters.category)
+      if (filters.category && filters.category !== 'all') params.append("category", filters.category)
       if (filters.startDate) params.append("startDate", filters.startDate)
       if (filters.endDate) params.append("endDate", filters.endDate)
       if (filters.search) params.append("search", filters.search)
@@ -355,8 +392,8 @@ export default function TransactionsPage() {
 
             {!isLoading && transactions.length === 0 && (
               <div className="flex flex-col items-center justify-center p-8 text-center">
-                <div className="rounded-full bg-muted p-3">
-                  <SwitchHorizontal className="h-6 w-6 text-muted-foreground" />
+                <div className="mb-2">
+                  <ThreeDIcon icon="solar:card-recive-bold-duotone" size={64} color="#6366f1" />
                 </div>
                 <h3 className="mt-4 text-lg font-semibold">No transactions found</h3>
                 <p className="mt-2 text-sm text-muted-foreground max-w-sm">

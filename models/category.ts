@@ -1,4 +1,5 @@
 import mongoose from "mongoose"
+import { connectToDatabase } from "../lib/mongodb"
 
 const CategorySchema = new mongoose.Schema({
   name: {
@@ -62,5 +63,51 @@ CategorySchema.pre("save", function (next) {
   next()
 })
 
-export const Category = mongoose.models.Category || mongoose.model("Category", CategorySchema)
+// Create a function to get the Category model with an established connection
+export async function getCategoryModel() {
+  await connectToDatabase()
+  return mongoose.models.Category || mongoose.model("Category", CategorySchema)
+}
+
+// For backward compatibility, still export the Category model directly
+// but with a safer initialization
+let Category: any
+try {
+  // Try to get the model if it exists
+  Category = mongoose.models.Category || mongoose.model("Category", CategorySchema)
+} catch (error) {
+  // If there's an error, we'll need to use the async function instead
+  Category = {
+    findOne: async (...args: any[]) => {
+      const model = await getCategoryModel()
+      return model.findOne(...args)
+    },
+    findById: async (...args: any[]) => {
+      const model = await getCategoryModel()
+      return model.findById(...args)
+    },
+    find: async (...args: any[]) => {
+      const model = await getCategoryModel()
+      return model.find(...args)
+    },
+    create: async (...args: any[]) => {
+      const model = await getCategoryModel()
+      return model.create(...args)
+    },
+    updateOne: async (...args: any[]) => {
+      const model = await getCategoryModel()
+      return model.updateOne(...args)
+    },
+    deleteOne: async (...args: any[]) => {
+      const model = await getCategoryModel()
+      return model.deleteOne(...args)
+    },
+    findByIdAndUpdate: async (...args: any[]) => {
+      const model = await getCategoryModel()
+      return model.findByIdAndUpdate(...args)
+    }
+  }
+}
+
+export { Category }
 

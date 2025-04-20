@@ -3,7 +3,10 @@ import { getServerSession } from "next-auth/next"
 import { connectToDatabase } from "../../../lib/mongodb"
 import { Transaction } from "../../../models/transaction"
 import { Category } from "../../../models/category"
+import { User } from "../../../models/user"
 import { authOptions } from "../auth/[...nextauth]/route"
+import { convertCurrency, convertToUSD } from "../../../lib/currency"
+import { sendTransactionAlert } from "../../../lib/notifications"
 
 export async function POST(request: Request) {
   try {
@@ -13,7 +16,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
     }
 
-    const { type, amount, category, description, date, paymentMethod, tags, location } = await request.json()
+    // Get user's preferred currency
+    await connectToDatabase()
+    const user = await User.findById(session.user.id)
+    const userCurrency = user?.preferences?.currency || "USD"
+
+    const { type, amount, category, description, date, paymentMethod, tags, location, currency = userCurrency } = await request.json()
 
     // Validate input
     if (!type || !amount || !category || !description || !date) {
@@ -37,10 +45,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: "Invalid category" }, { status: 400 })
     }
 
+    // Convert amount to USD for storage (we store all amounts in USD)
+    const amountUSD = convertToUSD(Number.parseFloat(amount), currency)
+
     // Create new transaction
     const newTransaction = new Transaction({
       userId: session.user.id,
-      amount: Number.parseFloat(amount),
+      amount: amountUSD,
       type,
       category,
       description,
@@ -48,9 +59,29 @@ export async function POST(request: Request) {
       paymentMethod: paymentMethod || "other",
       tags: tags || [],
       location: location || "",
+      originalCurrency: currency,
+      originalAmount: Number.parseFloat(amount),
     })
 
     await newTransaction.save()
+
+    // Send notification if transaction alerts are enabled
+    try {
+      // Get category name for the notification
+      const categoryName = categoryDoc.name || 'Uncategorized';
+
+      // Send transaction alert
+      await sendTransactionAlert(
+        session.user.id,
+        type,
+        Number.parseFloat(amount),
+        categoryName,
+        currency
+      );
+    } catch (notificationError) {
+      // Don't fail the transaction if notification fails
+      console.error('Failed to send transaction notification:', notificationError);
+    }
 
     return NextResponse.json(
       {
@@ -82,6 +113,10 @@ export async function GET(request: Request) {
     // Connect to database
     await connectToDatabase()
 
+    // Get user's preferred currency
+    const user = await User.findById(session.user.id)
+    const userCurrency = user?.preferences?.currency || "USD"
+
     // Get query parameters
     const { searchParams } = new URL(request.url)
     const limit = Number.parseInt(searchParams.get("limit") || "50")
@@ -93,6 +128,7 @@ export async function GET(request: Request) {
     const search = searchParams.get("search")
     const sortBy = searchParams.get("sortBy") || "date"
     const sortOrder = searchParams.get("sortOrder") || "desc"
+    const currency = searchParams.get("currency") || userCurrency
 
     // Build query
     const query: any = { userId: session.user.id }
@@ -130,14 +166,25 @@ export async function GET(request: Request) {
     // Get total count for pagination
     const total = await Transaction.countDocuments(query)
 
+    // Convert transaction amounts to the requested currency
+    const convertedTransactions = transactions.map(transaction => {
+      const convertedAmount = convertCurrency(transaction.amount, currency)
+      return {
+        ...transaction.toObject(),
+        amount: convertedAmount,
+        displayCurrency: currency
+      }
+    })
+
     return NextResponse.json({
-      transactions,
+      transactions: convertedTransactions,
       pagination: {
         total,
         limit,
         skip,
         hasMore: skip + transactions.length < total,
       },
+      currency
     })
   } catch (error) {
     console.error("Transaction error:", error)
