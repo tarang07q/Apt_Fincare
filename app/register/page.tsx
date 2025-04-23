@@ -9,7 +9,7 @@ import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "../../components/ui/card"
-import { PiggyBank } from "lucide-react"
+import { PiggyBank, ArrowLeft } from "lucide-react"
 import { useToast } from "../../components/ui/use-toast"
 
 export default function RegisterPage() {
@@ -98,8 +98,28 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 dark:bg-gray-900">
-      <Card className="w-full max-w-md">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-r from-emerald-50 to-emerald-100 px-4 py-12 dark:from-gray-800 dark:to-gray-900 relative overflow-hidden">
+      {/* Decorative elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
+        <div className="absolute top-20 left-10 w-64 h-64 rounded-full bg-emerald-200 opacity-20 blur-3xl"></div>
+        <div className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-teal-200 opacity-20 blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-emerald-100 opacity-10 blur-3xl"></div>
+      </div>
+
+      {/* Header */}
+      <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center">
+        <Link href="/" className="flex items-center gap-2">
+          <PiggyBank className="h-6 w-6 text-emerald-600" />
+          <span className="text-xl font-bold">FinTrack+</span>
+        </Link>
+        <div className="flex items-center gap-4">
+          <Link href="/login">
+            <Button variant="outline" size="sm">Login</Button>
+          </Link>
+        </div>
+      </div>
+
+      <Card className="w-full max-w-md shadow-lg z-10">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center gap-2 mb-2">
             <PiggyBank className="h-6 w-6 text-emerald-600" />
@@ -154,16 +174,22 @@ export default function RegisterPage() {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className="w-full bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white shadow-md" disabled={isLoading}>
               {isLoading ? "Creating account..." : "Create account"}
             </Button>
-            <div className="text-center text-sm">
-              Already have an account?{" "}
-              <Link
-                href="/login"
-                className="text-emerald-600 hover:text-emerald-700 dark:text-emerald-500 dark:hover:text-emerald-400"
-              >
-                Login
+            <div className="flex flex-col space-y-4 mt-4">
+              <div className="text-center text-sm">
+                Already have an account?{" "}
+                <Link
+                  href="/login"
+                  className="text-emerald-600 hover:text-emerald-700 dark:text-emerald-500 dark:hover:text-emerald-400 font-medium"
+                >
+                  Login
+                </Link>
+              </div>
+              <Link href="/" className="flex items-center justify-center text-sm text-gray-500 hover:text-gray-700">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Home
               </Link>
             </div>
           </CardFooter>

@@ -10,6 +10,8 @@ type ThemeSelectorProps = {
 }
 
 export function ThemeSelector({ value, onValueChange }: ThemeSelectorProps) {
+  // This is a controlled component - it doesn't directly update the theme
+  // The parent component is responsible for updating the theme when the form is submitted
   return (
     <RadioGroup value={value} onValueChange={onValueChange} className="grid grid-cols-3 gap-4">
       <div>

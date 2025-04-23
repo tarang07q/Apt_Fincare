@@ -54,9 +54,7 @@ export function DashboardHeader() {
           <DashboardSidebar />
         </SheetContent>
       </Sheet>
-      <div className="w-full flex-1">
-        <p className="text-center text-sm italic text-gray-500">"A budget is telling your money where to go instead of wondering where it went."</p>
-      </div>
+      <div className="flex-1"></div>
       <div className="flex items-center gap-2">
         <NotificationBell />
         <ThemeToggle />

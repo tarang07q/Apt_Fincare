@@ -64,6 +64,12 @@ const UserSchema = new mongoose.Schema({
   lastLogin: {
     type: Date,
   },
+  resetPasswordToken: {
+    type: String,
+  },
+  resetPasswordExpires: {
+    type: Date,
+  },
 })
 
 // Add index for faster queries

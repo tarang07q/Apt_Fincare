@@ -19,6 +19,18 @@ export default function ForgotPasswordPage() {
     e.preventDefault()
     setIsLoading(true)
 
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      })
+      setIsLoading(false)
+      return
+    }
+
     try {
       const response = await fetch("/api/auth/forgot-password", {
         method: "POST",
@@ -34,7 +46,14 @@ export default function ForgotPasswordPage() {
         throw new Error(data.message || "Failed to process request")
       }
 
+      // Show success message even if email doesn't exist (for security)
       setIsSubmitted(true)
+
+      // Show a toast message
+      toast({
+        title: "Reset Link Sent",
+        description: "If an account exists with that email, you will receive a password reset link shortly.",
+      })
     } catch (error) {
       toast({
         title: "Error",

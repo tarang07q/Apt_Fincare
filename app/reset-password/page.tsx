@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "../../components/ui/button"
@@ -22,7 +22,7 @@ export default function ResetPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (password !== confirmPassword) {
       toast({
         title: "Passwords don't match",
@@ -55,11 +55,16 @@ export default function ResetPasswordPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.message || "Failed to reset password")
+        if (response.status === 400 && data.message.includes("token is invalid")) {
+          setTokenError(true)
+          throw new Error("Password reset link is invalid or has expired")
+        } else {
+          throw new Error(data.message || "Failed to reset password")
+        }
       }
 
       setIsReset(true)
-      
+
       // Redirect to login after 3 seconds
       setTimeout(() => {
         router.push("/login")
@@ -75,8 +80,21 @@ export default function ResetPasswordPage() {
     }
   }
 
-  // If no token is provided, show an error
-  if (!token) {
+  const [tokenError, setTokenError] = useState(false)
+
+  // Check token validity when component mounts
+  useEffect(() => {
+    if (!token) {
+      setTokenError(true)
+      return
+    }
+
+    // Optionally, you could verify the token with the server here
+    // For now, we'll just check if it exists
+  }, [token])
+
+  // If no token is provided or token is invalid, show an error
+  if (!token || tokenError) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-r from-emerald-50 to-emerald-100 px-4 py-12 dark:from-gray-800 dark:to-gray-900">
         <Card className="w-full max-w-md shadow-lg">

@@ -37,6 +37,10 @@ export default function SettingsPage() {
   const { setTheme, theme } = useTheme()
   const { currency, setCurrency } = useCurrencyContext()
 
+  // Local state for form values
+  const [selectedTheme, setSelectedTheme] = useState(theme || "light")
+  const [selectedCurrency, setSelectedCurrency] = useState(currency || "USD")
+
   // Get the tab from URL query parameters
   const tabParam = searchParams.get('tab')
 
@@ -145,20 +149,17 @@ export default function SettingsPage() {
 
     setIsSaving(true)
     try {
-      // Get the current currency from localStorage or context
-      const currentCurrency = localStorage.getItem("currency") || currency || "USD"
-
       // Update theme in provider
       console.log("Saving preferences - Theme:", values.theme)
-      console.log("Using current currency:", currentCurrency)
+      console.log("Saving preferences - Currency:", values.currency)
 
+      // Update theme in provider and localStorage
       setTheme(values.theme)
-
-      // Force update localStorage for theme
       localStorage.setItem("theme", values.theme)
 
-      // Use the current currency instead of form value
-      values.currency = currentCurrency
+      // Update currency in provider and localStorage
+      setCurrency(values.currency)
+      localStorage.setItem("currency", values.currency)
 
       const response = await fetch(`/api/users/${userId}/preferences`, {
         method: "PUT",
@@ -229,11 +230,24 @@ export default function SettingsPage() {
               ) : (
                 <Form {...preferencesForm}>
                   <form onSubmit={preferencesForm.handleSubmit(onPreferencesSubmit)} className="space-y-6">
-                    <FormItem>
-                      <FormLabel>Currency</FormLabel>
-                      <FixedCurrencySelector />
-                      <FormDescription>Select the currency to use for displaying amounts</FormDescription>
-                    </FormItem>
+                    <FormField
+                      control={preferencesForm.control}
+                      name="currency"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Currency</FormLabel>
+                          <FixedCurrencySelector
+                            onChange={(value) => {
+                              // Only update the form value, not the actual currency yet
+                              field.onChange(value);
+                              console.log("Currency selected (not saved yet):", value);
+                            }}
+                          />
+                          <FormDescription>Select the currency to use for displaying amounts</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
                     <FormField
                       control={preferencesForm.control}
@@ -244,11 +258,9 @@ export default function SettingsPage() {
                           <ThemeSelector
                             value={field.value}
                             onValueChange={(value) => {
+                              // Only update the form value, not the actual theme yet
                               field.onChange(value);
-                              // Directly update the theme context and localStorage
-                              setTheme(value);
-                              localStorage.setItem("theme", value);
-                              console.log("Theme directly changed to:", value);
+                              console.log("Theme selected (not saved yet):", value);
                             }}
                           />
                           <FormDescription>Choose your preferred theme</FormDescription>

@@ -27,39 +27,62 @@ const currencies = [
   { code: "RUB", name: "Russian Ruble (₽)", symbol: "₽" },
 ]
 
-export function FixedCurrencySelector() {
+export function FixedCurrencySelector({ onChange }: { onChange?: (currency: string) => void }) {
   const { currency, setCurrency } = useCurrencyContext()
   const [selectedCurrency, setSelectedCurrency] = useState(currency || "USD")
-  
+
   // Initialize with the current currency from context
   useEffect(() => {
     if (currency && currency !== selectedCurrency) {
       setSelectedCurrency(currency)
     }
   }, [currency])
-  
+
   // Handle currency change
   const handleCurrencyChange = (value: string) => {
-    console.log("Currency changed to:", value)
-    
-    // Update local state
+    console.log("Currency selected (not saved yet):", value)
+
+    // Only update local state - don't update context or localStorage yet
+    // This will be done when the form is submitted
     setSelectedCurrency(value)
-    
+
+    // Call the onChange handler if provided
+    if (onChange) {
+      onChange(value)
+    }
+  }
+
+  // This function will be called by the parent component when the form is submitted
+  useEffect(() => {
+    // Expose the saveCurrency function to the parent component
+    if (window) {
+      (window as any).saveCurrency = saveCurrency
+    }
+
+    return () => {
+      if (window) {
+        delete (window as any).saveCurrency
+      }
+    }
+  }, [selectedCurrency])
+
+  const saveCurrency = () => {
+    console.log("Saving currency to context and localStorage:", selectedCurrency)
+
     // Update global context
-    setCurrency(value)
-    
-    // Update localStorage directly
+    setCurrency(selectedCurrency)
+
+    // Update localStorage
     try {
-      localStorage.setItem("currency", value)
-      console.log("Currency saved to localStorage:", value)
+      localStorage.setItem("currency", selectedCurrency)
+      console.log("Currency saved to localStorage:", selectedCurrency)
+      return true
     } catch (error) {
       console.error("Failed to save currency to localStorage:", error)
+      return false
     }
-    
-    // Force a page refresh to ensure all components update
-    // window.location.reload()
   }
-  
+
   return (
     <div className="space-y-2">
       <Select value={selectedCurrency} onValueChange={handleCurrencyChange}>

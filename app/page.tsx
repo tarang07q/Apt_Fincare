@@ -17,8 +17,17 @@ export default function Home() {
             <Link href="#features" className="text-sm font-medium hover:underline underline-offset-4">
               Features
             </Link>
-            <Link href="#about" className="text-sm font-medium hover:underline underline-offset-4">
+            <Link href="/about" className="text-sm font-medium hover:underline underline-offset-4">
               About
+            </Link>
+            <Link href="/features/expense-tracking" className="text-sm font-medium hover:underline underline-offset-4">
+              Expense Tracking
+            </Link>
+            <Link href="/features/analytics" className="text-sm font-medium hover:underline underline-offset-4">
+              Analytics
+            </Link>
+            <Link href="/features/budgeting" className="text-sm font-medium hover:underline underline-offset-4">
+              Budgeting
             </Link>
           </nav>
           <div className="flex items-center gap-4">
@@ -32,7 +41,13 @@ export default function Home() {
         </div>
       </header>
       <main className="flex-1">
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-white to-emerald-50">
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-white to-emerald-50 relative overflow-hidden">
+          {/* Decorative elements */}
+          <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
+            <div className="absolute top-20 left-10 w-64 h-64 rounded-full bg-emerald-200 opacity-20 blur-3xl"></div>
+            <div className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-teal-200 opacity-20 blur-3xl"></div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-emerald-100 opacity-10 blur-3xl"></div>
+          </div>
           <div className="container px-4 md:px-6">
             <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
               <div className="flex flex-col justify-center space-y-4">
@@ -158,6 +173,12 @@ export default function Home() {
                     Receipt attachments
                   </li>
                 </ul>
+                <Link href="/features/expense-tracking" className="mt-2">
+                  <Button variant="outline" size="sm" className="text-emerald-600 border-emerald-600">
+                    Learn More
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
               <div className="flex flex-col items-center space-y-4 rounded-xl border border-emerald-100 bg-white p-6 shadow-md transition-all hover:shadow-lg">
                 <div className="rounded-full bg-emerald-100 p-3">
@@ -181,6 +202,12 @@ export default function Home() {
                     Trend analysis
                   </li>
                 </ul>
+                <Link href="/features/analytics" className="mt-2">
+                  <Button variant="outline" size="sm" className="text-emerald-600 border-emerald-600">
+                    Learn More
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
               <div className="flex flex-col items-center space-y-4 rounded-xl border border-emerald-100 bg-white p-6 shadow-md transition-all hover:shadow-lg">
                 <div className="rounded-full bg-emerald-100 p-3">
@@ -204,6 +231,12 @@ export default function Home() {
                     Goal tracking
                   </li>
                 </ul>
+                <Link href="/features/budgeting" className="mt-2">
+                  <Button variant="outline" size="sm" className="text-emerald-600 border-emerald-600">
+                    Learn More
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
             </div>
 
@@ -224,6 +257,23 @@ export default function Home() {
             <PiggyBank className="h-6 w-6 text-emerald-600" />
             <span className="text-xl font-bold">FinTrack+</span>
           </div>
+          <nav className="flex gap-4 md:gap-6 md:ml-auto">
+            <Link href="/" className="text-sm font-medium hover:underline underline-offset-4">
+              Home
+            </Link>
+            <Link href="/about" className="text-sm font-medium hover:underline underline-offset-4">
+              About
+            </Link>
+            <Link href="/features/expense-tracking" className="text-sm font-medium hover:underline underline-offset-4">
+              Expense Tracking
+            </Link>
+            <Link href="/features/analytics" className="text-sm font-medium hover:underline underline-offset-4">
+              Analytics
+            </Link>
+            <Link href="/features/budgeting" className="text-sm font-medium hover:underline underline-offset-4">
+              Budgeting
+            </Link>
+          </nav>
           <p className="text-sm text-gray-500 md:ml-auto">© 2023 FinTrack+. All rights reserved.</p>
         </div>
       </footer>

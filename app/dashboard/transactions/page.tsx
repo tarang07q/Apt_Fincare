@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect } from "react"
@@ -18,6 +19,7 @@ import {
 } from "lucide-react"
 import { ThreeDIcon } from "../../../components/ui/3d-icon"
 import { Tabs, TabsList, TabsTrigger } from "../../../components/ui/tabs"
+import { useCurrencyContext } from "../../../components/currency-provider"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../../components/ui/dialog"
 import { AddTransactionForm } from "../../../components/transactions/add-transaction-form"
 import { TransactionList } from "../../../components/transactions/transaction-list"
@@ -39,6 +41,7 @@ export default function TransactionsPage() {
   const { toast } = useToast()
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { currency } = useCurrencyContext()
 
   const [isLoading, setIsLoading] = useState(true)
   const [transactions, setTransactions] = useState<any[]>([])
@@ -52,13 +55,13 @@ export default function TransactionsPage() {
 
   // Fix type declarations
   const [filters, setFilters] = useState<Filter>({
-    type: searchParams.get("type") || "",
-    category: searchParams.get("category") || "",
-    startDate: searchParams.get("startDate") || "",
-    endDate: searchParams.get("endDate") || "",
-    search: searchParams.get("search") || "",
-    sortBy: searchParams.get("sortBy") || "date",
-    sortOrder: searchParams.get("sortOrder") || "desc",
+    type: searchParams?.get("type") || "",
+    category: searchParams?.get("category") || "",
+    startDate: searchParams?.get("startDate") || "",
+    endDate: searchParams?.get("endDate") || "",
+    search: searchParams?.get("search") || "",
+    sortBy: searchParams?.get("sortBy") || "date",
+    sortOrder: searchParams?.get("sortOrder") || "desc",
   })
 
   const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false)
@@ -217,6 +220,9 @@ export default function TransactionsPage() {
       if (filters.startDate) params.append("startDate", filters.startDate)
       if (filters.endDate) params.append("endDate", filters.endDate)
       if (filters.search) params.append("search", filters.search)
+
+      // Add currency parameter
+      params.append("currency", currency)
 
       const response = await fetch(`/api/transactions/export?${params.toString()}`)
 

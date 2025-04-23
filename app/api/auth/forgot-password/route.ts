@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { connectToDatabase } from "../../../../lib/mongodb"
 import { User } from "../../../../models/user"
 import crypto from "crypto"
+import { sendAccountActivityAlert } from "../../../../lib/notifications"
 
 // In a real application, you would send an email with a reset link
 // For this demo, we'll just simulate the process
@@ -21,23 +22,37 @@ export async function POST(request: Request) {
 
     // For security reasons, don't reveal if the user exists or not
     // Always return a success message even if the user doesn't exist
-    
+
     // In a real application, you would:
     // 1. Generate a reset token
     // 2. Store it in the database with an expiration
     // 3. Send an email with a link containing the token
-    
+
     if (user) {
-      // Generate a reset token (not stored in this demo)
+      // Generate a reset token
       const resetToken = crypto.randomBytes(32).toString("hex")
-      
-      // In a real app, you would store this token and its expiration
-      // user.resetPasswordToken = resetToken
-      // user.resetPasswordExpires = Date.now() + 3600000 // 1 hour
-      // await user.save()
-      
+
+      // Store the token and its expiration (1 hour from now)
+      user.resetPasswordToken = resetToken
+      user.resetPasswordExpires = new Date(Date.now() + 3600000) // 1 hour
+      await user.save()
+
       // In a real app, you would send an email with the reset link
-      console.log(`Reset token for ${email}: ${resetToken}`)
+      // For demo purposes, we'll log it to the console
+      const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`
+      console.log(`Reset URL for ${email}: ${resetUrl}`)
+
+      // Send notification about password reset request
+      try {
+        await sendAccountActivityAlert(
+          user._id.toString(),
+          "Password Reset Requested",
+          `A password reset was requested for your account. If this wasn't you, please secure your account.`
+        )
+      } catch (notificationError) {
+        console.error("Failed to send password reset notification:", notificationError)
+        // Don't fail the request if notification fails
+      }
     }
 
     // Always return success to prevent email enumeration attacks
