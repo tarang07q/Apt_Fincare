@@ -49,13 +49,70 @@ Apt_Fincare is a comprehensive personal finance management system built with Nex
 
 ![Analytics Dashboard](https://github.com/user-attachments/assets/69ad3abc-ebf0-4cf6-8238-5c61d77f37a7)
 
-
 ## Tech Stack
 - **Frontend**: Next.js, TailwindCSS
 - **Backend**: Node.js
 - **Database**: MongoDB
 - **Authentication**: NextAuth.js
 - **State Management**: React Context/Hooks
+
+## Project Structure
+```
+apt_fincare/
+├── app/
+│   ├── api/
+│   │   └── auth/
+│   ├── dashboard/
+│   │   ├── transactions/
+│   │   ├── budgets/
+│   │   └── analytics/
+│   ├── globals.css
+│   └── layout.tsx
+├── components/
+│   ├── ui/
+│   │   ├── buttons/
+│   │   ├── forms/
+│   │   └── cards/
+│   ├── auth-provider.tsx
+│   ├── currency-provider.tsx
+│   └── theme-provider.tsx
+├── lib/
+│   ├── utils/
+│   └── hooks/
+├── public/
+│   ├── images/
+│   └── icons/
+├── styles/
+│   └── globals.css
+├── types/
+│   └── index.ts
+├── .env
+├── .gitignore
+├── next.config.mjs
+├── package.json
+├── README.md
+├── tailwind.config.ts
+└── tsconfig.json
+```
+
+### Directory Structure Overview
+
+- **/app**: Next.js 13+ app directory containing routes and layouts
+  - **/api**: Backend API routes including authentication endpoints
+  - **/dashboard**: Main application pages and features
+  
+- **/components**: Reusable React components
+  - **/ui**: Shared UI components like buttons, forms, and cards
+  
+- **/lib**: Utility functions and custom hooks
+  - **/utils**: Helper functions and utilities
+  - **/hooks**: Custom React hooks
+  
+- **/public**: Static assets like images and icons
+  
+- **/styles**: Global styles and CSS modules
+  
+- **/types**: TypeScript type definitions
 
 ## Getting Started
 
