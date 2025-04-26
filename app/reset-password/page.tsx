@@ -82,16 +82,78 @@ export default function ResetPasswordPage() {
 
   const [tokenError, setTokenError] = useState(false)
 
+  const [maskedEmail, setMaskedEmail] = useState<string>('')
+  const [isVerifying, setIsVerifying] = useState<boolean>(true)
+
   // Check token validity when component mounts
   useEffect(() => {
     if (!token) {
       setTokenError(true)
+      setIsVerifying(false)
       return
     }
 
-    // Optionally, you could verify the token with the server here
-    // For now, we'll just check if it exists
-  }, [token])
+    // Verify the token with the server
+    const verifyToken = async () => {
+      try {
+        setIsVerifying(true)
+        const response = await fetch('/api/auth/verify-token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ token }),
+        })
+
+        const data = await response.json()
+
+        if (!response.ok || !data.valid) {
+          setTokenError(true)
+          toast({
+            title: 'Invalid or Expired Link',
+            description: data.message || 'The password reset link is invalid or has expired.',
+            variant: 'destructive',
+          })
+        } else if (data.email) {
+          setMaskedEmail(data.email)
+        }
+      } catch (error) {
+        setTokenError(true)
+        toast({
+          title: 'Verification Error',
+          description: 'An error occurred while verifying the reset link.',
+          variant: 'destructive',
+        })
+      } finally {
+        setIsVerifying(false)
+      }
+    }
+
+    verifyToken()
+  }, [token, toast])
+
+  // Show loading state while verifying token
+  if (isVerifying) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-r from-emerald-50 to-emerald-100 px-4 py-12 dark:from-gray-800 dark:to-gray-900">
+        <Card className="w-full max-w-md shadow-lg">
+          <CardHeader className="space-y-1">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <PiggyBank className="h-6 w-6 text-emerald-600" />
+              <span className="text-xl font-bold">FinTrack+</span>
+            </div>
+            <CardTitle className="text-2xl font-bold text-center">Verifying Reset Link</CardTitle>
+            <CardDescription className="text-center">
+              Please wait while we verify your password reset link...
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex justify-center py-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
 
   // If no token is provided or token is invalid, show an error
   if (!token || tokenError) {
@@ -138,7 +200,9 @@ export default function ResetPasswordPage() {
           <CardTitle className="text-2xl font-bold text-center">Reset Your Password</CardTitle>
           <CardDescription className="text-center">
             {!isReset
-              ? "Enter your new password below"
+              ? maskedEmail
+                ? `Enter a new password for ${maskedEmail}`
+                : "Enter your new password below"
               : "Your password has been reset successfully"}
           </CardDescription>
         </CardHeader>

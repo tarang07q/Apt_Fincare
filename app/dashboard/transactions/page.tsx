@@ -24,7 +24,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { AddTransactionForm } from "../../../components/transactions/add-transaction-form"
 import { TransactionList } from "../../../components/transactions/transaction-list"
 import { TransactionFilters } from "../../../components/transactions/transaction-filters"
-import Papa from 'papaparse'
+
 
 // Define a type for filters
 interface Filter {
@@ -206,8 +206,11 @@ export default function TransactionsPage() {
     fetchTransactions(true)
   }
 
+  const [isExporting, setIsExporting] = useState(false)
+
   const handleExport = async () => {
     try {
+      setIsExporting(true)
       toast({
         title: "Exporting transactions",
         description: "Your transactions are being exported to CSV",
@@ -235,7 +238,22 @@ export default function TransactionsPage() {
       const a = document.createElement("a")
       a.style.display = "none"
       a.href = url
-      a.download = `transactions-${format(new Date(), "yyyy-MM-dd")}.csv`
+
+      // Include date range in filename if filters are applied
+      let filename = "transactions"
+      if (filters.startDate) {
+        const start = new Date(filters.startDate)
+        filename += `-from-${format(start, "yyyy-MM-dd")}`
+      }
+      if (filters.endDate) {
+        const end = new Date(filters.endDate)
+        filename += `-to-${format(end, "yyyy-MM-dd")}`
+      }
+      if (!filters.startDate && !filters.endDate) {
+        filename += `-${format(new Date(), "yyyy-MM-dd")}`
+      }
+
+      a.download = `${filename}.csv`
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)
@@ -250,51 +268,12 @@ export default function TransactionsPage() {
         description: error instanceof Error ? error.message : "Failed to export transactions",
         variant: "destructive",
       })
+    } finally {
+      setIsExporting(false)
     }
   }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      Papa.parse(file, {
-        header: true,
-        complete: (results: { data: any[] }) => {
-          const transactions = results.data;
-          // Add logic to process transactions
-        },
-      });
-    }
-  }
-
-  const handleImport = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const response = await fetch('/api/transactions/import', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(transactions),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to import transactions');
-      }
-
-      toast({
-        title: 'Import successful',
-        description: 'Transactions have been imported successfully',
-      });
-
-      fetchTransactions(true);
-    } catch (error) {
-      toast({
-        title: 'Import failed',
-        description: error instanceof Error ? error.message : 'Failed to import transactions',
-        variant: 'destructive',
-      });
-    }
-  };
+  // Export functionality is handled by handleExport
 
   return (
     <div className="space-y-4">
@@ -329,8 +308,12 @@ export default function TransactionsPage() {
             <span className="sr-only">Refresh</span>
           </Button>
 
-          <Button variant="outline" size="icon" onClick={handleExport}>
-            <Download className="h-4 w-4" />
+          <Button variant="outline" size="icon" onClick={handleExport} disabled={isExporting}>
+            {isExporting ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4" />
+            )}
             <span className="sr-only">Export</span>
           </Button>
 
@@ -414,13 +397,7 @@ export default function TransactionsPage() {
           </CardContent>
         </Card>
 
-        <div className="mt-4">
-          <h2 className="text-lg font-bold">Import Transactions</h2>
-          <form onSubmit={handleImport} className="flex items-center space-x-4">
-            <input type="file" accept=".csv" onChange={handleFileChange} className="border p-2" />
-            <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white">Import</Button>
-          </form>
-        </div>
+
       </div>
     </div>
   )

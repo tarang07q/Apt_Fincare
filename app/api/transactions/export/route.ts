@@ -48,12 +48,17 @@ export async function GET(request: Request) {
       }
     }
 
-    if (startDate) {
-      query.date = { ...query.date, $gte: new Date(startDate) }
-    }
+    // Handle date filtering - allow filtering by either start date, end date, or both
+    if (startDate || endDate) {
+      query.date = {}
 
-    if (endDate) {
-      query.date = { ...query.date, $lte: new Date(endDate) }
+      if (startDate) {
+        query.date.$gte = new Date(startDate)
+      }
+
+      if (endDate) {
+        query.date.$lte = new Date(endDate)
+      }
     }
 
     if (search) {

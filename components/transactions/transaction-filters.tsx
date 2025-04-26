@@ -75,7 +75,7 @@ export function TransactionFilters({ filters, onFilterChange, categories }: Tran
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
         <div className="space-y-2">
-          <label className="text-sm font-medium">Category</label>
+          <label className="text-sm font-medium text-foreground dark:text-gray-200">Category</label>
           <Select value={filters.category} onValueChange={(value) => onFilterChange({ category: value })}>
             <SelectTrigger>
               <SelectValue placeholder="All Categories" />
@@ -95,15 +95,20 @@ export function TransactionFilters({ filters, onFilterChange, categories }: Tran
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">Start Date</label>
+          <label className="text-sm font-medium text-foreground dark:text-gray-200">Start Date</label>
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="w-full justify-start text-left font-normal">
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {startDate ? format(startDate, "PPP") : "Pick a date"}
+              <Button
+                variant="outline"
+                className="w-full justify-start text-left font-normal bg-card dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-gray-100"
+              >
+                <CalendarIcon className="mr-2 h-4 w-4 text-emerald-500 dark:text-emerald-400" />
+                <span className="truncate">
+                  {startDate ? format(startDate, "PPP") : "Pick a date"}
+                </span>
                 {startDate && (
                   <X
-                    className="ml-auto h-4 w-4 hover:text-destructive"
+                    className="ml-auto h-4 w-4 hover:text-destructive dark:hover:text-red-400"
                     onClick={(e) => {
                       e.stopPropagation()
                       handleStartDateSelect(undefined)
@@ -112,22 +117,35 @@ export function TransactionFilters({ filters, onFilterChange, categories }: Tran
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <Calendar mode="single" selected={startDate} onSelect={handleStartDateSelect} initialFocus />
+            <PopoverContent className="w-auto p-0 border-0" align="start">
+              <Calendar
+                mode="single"
+                selected={startDate}
+                onSelect={handleStartDateSelect}
+                initialFocus
+                className="rounded-md border-0 shadow-none"
+                fromYear={new Date().getFullYear() - 10}
+                toYear={new Date().getFullYear() + 10}
+              />
             </PopoverContent>
           </Popover>
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">End Date</label>
+          <label className="text-sm font-medium text-foreground dark:text-gray-200">End Date</label>
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="w-full justify-start text-left font-normal">
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {endDate ? format(endDate, "PPP") : "Pick a date"}
+              <Button
+                variant="outline"
+                className="w-full justify-start text-left font-normal bg-card dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-gray-100"
+              >
+                <CalendarIcon className="mr-2 h-4 w-4 text-emerald-500 dark:text-emerald-400" />
+                <span className="truncate">
+                  {endDate ? format(endDate, "PPP") : "Pick a date"}
+                </span>
                 {endDate && (
                   <X
-                    className="ml-auto h-4 w-4 hover:text-destructive"
+                    className="ml-auto h-4 w-4 hover:text-destructive dark:hover:text-red-400"
                     onClick={(e) => {
                       e.stopPropagation()
                       handleEndDateSelect(undefined)
@@ -136,14 +154,22 @@ export function TransactionFilters({ filters, onFilterChange, categories }: Tran
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <Calendar mode="single" selected={endDate} onSelect={handleEndDateSelect} initialFocus />
+            <PopoverContent className="w-auto p-0 border-0" align="start">
+              <Calendar
+                mode="single"
+                selected={endDate}
+                onSelect={handleEndDateSelect}
+                initialFocus
+                className="rounded-md border-0 shadow-none"
+                fromYear={new Date().getFullYear() - 10}
+                toYear={new Date().getFullYear() + 10}
+              />
             </PopoverContent>
           </Popover>
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">Sort By</label>
+          <label className="text-sm font-medium text-foreground dark:text-gray-200">Sort By</label>
           <div className="flex gap-2">
             <Select value={filters.sortBy} onValueChange={(value) => onFilterChange({ sortBy: value })}>
               <SelectTrigger className="flex-1">

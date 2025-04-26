@@ -99,14 +99,23 @@ export default function ProfilePage() {
         throw new Error("Failed to update profile")
       }
 
-      // Update session with new name
+      // Get the updated user data from the response
+      const updatedUser = await response.json()
+
+      // Update session with new user data
       await update({
         ...session,
         user: {
           ...session.user,
-          name: values.name,
+          name: updatedUser.name,
         },
       })
+
+      // Force a reload to ensure all components reflect the updated name
+      // This is optional but helps ensure the UI is consistent
+      setTimeout(() => {
+        window.location.reload()
+      }, 1000)
 
       toast({
         title: "Profile updated",

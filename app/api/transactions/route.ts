@@ -133,10 +133,16 @@ export async function GET(request: Request) {
     // Build query
     const query: any = { userId: session.user.id }
 
-    if (startDate && endDate) {
-      query.date = {
-        $gte: new Date(startDate),
-        $lte: new Date(endDate),
+    // Handle date filtering - allow filtering by either start date, end date, or both
+    if (startDate || endDate) {
+      query.date = {}
+
+      if (startDate) {
+        query.date.$gte = new Date(startDate)
+      }
+
+      if (endDate) {
+        query.date.$lte = new Date(endDate)
       }
     }
 

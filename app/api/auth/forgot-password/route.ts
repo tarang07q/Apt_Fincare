@@ -3,6 +3,7 @@ import { connectToDatabase } from "../../../../lib/mongodb"
 import { User } from "../../../../models/user"
 import crypto from "crypto"
 import { sendAccountActivityAlert } from "../../../../lib/notifications"
+import { sendPasswordResetEmail } from "../../../../lib/resend"
 
 // In a real application, you would send an email with a reset link
 // For this demo, we'll just simulate the process
@@ -37,10 +38,14 @@ export async function POST(request: Request) {
       user.resetPasswordExpires = new Date(Date.now() + 3600000) // 1 hour
       await user.save()
 
-      // In a real app, you would send an email with the reset link
-      // For demo purposes, we'll log it to the console
-      const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`
-      console.log(`Reset URL for ${email}: ${resetUrl}`)
+      // Send the password reset email
+      const emailResult = await sendPasswordResetEmail(email, resetToken)
+
+      if (emailResult.success) {
+        console.log(`Password reset email sent to ${email}. Preview: ${emailResult.previewUrl || 'N/A'}`)
+      } else {
+        console.error(`Failed to send password reset email to ${email}:`, emailResult.error)
+      }
 
       // Send notification about password reset request
       try {
