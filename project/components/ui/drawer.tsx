@@ -48,6 +48,10 @@ const DrawerContent = React.forwardRef<
       )}
       {...props}
     >
+      {/* Add a visually hidden title for accessibility */}
+      <DrawerPrimitive.Title className="sr-only">
+        Drawer Dialog
+      </DrawerPrimitive.Title>
       <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
       {children}
     </DrawerPrimitive.Content>

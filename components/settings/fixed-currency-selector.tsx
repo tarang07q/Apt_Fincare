@@ -90,6 +90,7 @@ export function FixedCurrencySelector({ onChange }: { onChange?: (currency: stri
           <SelectValue placeholder="Select currency" />
         </SelectTrigger>
         <SelectContent>
+          <div aria-hidden="true" className="sr-only">Currency options</div>
           {currencies.map((curr) => (
             <SelectItem key={curr.code} value={curr.code}>
               <div className="flex items-center">

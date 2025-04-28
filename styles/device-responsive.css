@@ -1,0 +1,169 @@
+/* Device-specific styles */
+
+/* Small phones (iPhone 4, iPhone 5/SE, Nokia Lumia 520) */
+@media screen and (max-width: 320px) {
+  .container {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  
+  .card {
+    padding: 0.75rem;
+  }
+  
+  .text-2xl {
+    font-size: 1.25rem;
+  }
+  
+  .tabs-list {
+    flex-wrap: wrap;
+  }
+  
+  .form-label {
+    font-size: 0.875rem;
+  }
+  
+  .form-description {
+    font-size: 0.75rem;
+  }
+}
+
+/* Medium phones (iPhone XR, Pixel 3, Samsung Galaxy S8+) */
+@media screen and (min-width: 321px) and (max-width: 414px) {
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  
+  .card {
+    padding: 1rem;
+  }
+}
+
+/* Tablets (iPad Mini, iPad Air, Surface Duo) */
+@media screen and (min-width: 540px) and (max-width: 912px) {
+  .container {
+    max-width: 95%;
+  }
+}
+
+/* Specific device adjustments */
+
+/* iPhone 4 */
+@media screen and (width: 320px) and (height: 480px) {
+  .device-iphone4 {
+    font-size: 0.875rem;
+  }
+}
+
+/* iPhone 5/SE */
+@media screen and (width: 320px) and (height: 568px) {
+  .device-iphone5se {
+    font-size: 0.875rem;
+  }
+}
+
+/* Nokia Lumia 520 */
+@media screen and (width: 320px) and (height: 533px) {
+  .device-nokia-lumia {
+    font-size: 0.875rem;
+  }
+}
+
+/* Nokia N9 */
+@media screen and (width: 480px) and (height: 854px) {
+  .device-nokia-n9 {
+    font-size: 0.9rem;
+  }
+}
+
+/* Pixel 3 */
+@media screen and (width: 393px) and (height: 786px) {
+  .device-pixel3 {
+    font-size: 0.9rem;
+  }
+}
+
+/* Pixel 4 */
+@media screen and (width: 393px) and (height: 786px) {
+  .device-pixel4 {
+    font-size: 0.9rem;
+  }
+}
+
+/* iPhone XR */
+@media screen and (width: 414px) and (height: 896px) {
+  .device-iphonexr {
+    font-size: 0.9rem;
+  }
+}
+
+/* iPhone 12 Pro */
+@media screen and (width: 390px) and (height: 844px) {
+  .device-iphone12pro {
+    font-size: 0.9rem;
+  }
+}
+
+/* iPhone 14 Pro Max */
+@media screen and (width: 430px) and (height: 932px) {
+  .device-iphone14promax {
+    font-size: 1rem;
+  }
+}
+
+/* Pixel 3 XL */
+@media screen and (width: 412px) and (height: 846px) {
+  .device-pixel3xl {
+    font-size: 0.9rem;
+  }
+}
+
+/* Samsung Galaxy S8+ */
+@media screen and (width: 360px) and (height: 740px) {
+  .device-galaxys8plus {
+    font-size: 0.9rem;
+  }
+}
+
+/* Samsung Galaxy S20 Ultra */
+@media screen and (width: 412px) and (height: 915px) {
+  .device-galaxys20ultra {
+    font-size: 0.9rem;
+  }
+}
+
+/* iPad Mini */
+@media screen and (width: 768px) and (height: 1024px) {
+  .device-ipadmini {
+    font-size: 1rem;
+  }
+}
+
+/* iPad Air */
+@media screen and (width: 820px) and (height: 1180px) {
+  .device-ipadair {
+    font-size: 1rem;
+  }
+}
+
+/* Surface Pro 7 */
+@media screen and (width: 912px) and (height: 1368px) {
+  .device-surfacepro7 {
+    font-size: 1rem;
+  }
+}
+
+/* Surface Duo */
+@media screen and (width: 540px) and (height: 720px) {
+  .device-surfaceduo {
+    font-size: 0.95rem;
+  }
+}
+
+/* Galaxy Z Fold 2 */
+@media screen and (width: 884px) and (height: 1104px) {
+  .device-galaxyzfold2 {
+    font-size: 1rem;
+  }
+}

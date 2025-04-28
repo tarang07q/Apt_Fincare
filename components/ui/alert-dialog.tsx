@@ -40,7 +40,17 @@ const AlertDialogContent = React.forwardRef<
         className
       )}
       {...props}
-    />
+    >
+      {/* Add a visually hidden title for accessibility */}
+      <AlertDialogPrimitive.Title className="sr-only">
+        Alert Dialog
+      </AlertDialogPrimitive.Title>
+      {/* Add a visually hidden description for accessibility */}
+      <AlertDialogPrimitive.Description className="sr-only">
+        Alert Dialog Description
+      </AlertDialogPrimitive.Description>
+      {props.children}
+    </AlertDialogPrimitive.Content>
   </AlertDialogPortal>
 ))
 AlertDialogContent.displayName = AlertDialogPrimitive.Content.displayName

@@ -81,6 +81,8 @@ const SelectContent = React.forwardRef<
             "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"
         )}
       >
+        {/* Add a visually hidden label for accessibility using aria-label instead */}
+        <div aria-hidden="true" className="sr-only">Select Options</div>
         {children}
       </SelectPrimitive.Viewport>
       <SelectScrollDownButton />

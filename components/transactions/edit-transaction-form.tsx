@@ -14,7 +14,7 @@ import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group"
 import { Loader2 } from "lucide-react"
 
 const formSchema = z.object({
-  type: z.enum(["expense", "income", "transfer"]),
+  type: z.enum(["expense", "income"]),
   amount: z
     .string()
     .min(1, "Amount is required")
@@ -41,7 +41,7 @@ type Category = {
 type Transaction = {
   _id: string
   amount: number
-  type: "expense" | "income" | "transfer"
+  type: "expense" | "income"
   category: {
     _id: string
     name: string
@@ -65,7 +65,7 @@ export function EditTransactionForm({ transaction, onSuccess }: EditTransactionF
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingCategories, setIsLoadingCategories] = useState(true)
   const [categories, setCategories] = useState<Category[]>([])
-  const [transactionType, setTransactionType] = useState<"expense" | "income" | "transfer">(transaction.type)
+  const [transactionType, setTransactionType] = useState<"expense" | "income">(transaction.type)
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -160,7 +160,7 @@ export function EditTransactionForm({ transaction, onSuccess }: EditTransactionF
               <FormLabel>Transaction Type</FormLabel>
               <FormControl>
                 <RadioGroup
-                  onValueChange={(value: "expense" | "income" | "transfer") => {
+                  onValueChange={(value: "expense" | "income") => {
                     field.onChange(value)
                     setTransactionType(value)
                     form.setValue("category", "")
@@ -178,12 +178,6 @@ export function EditTransactionForm({ transaction, onSuccess }: EditTransactionF
                     <RadioGroupItem value="income" id="income" />
                     <FormLabel htmlFor="income" className="font-normal">
                       Income
-                    </FormLabel>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="transfer" id="transfer" />
-                    <FormLabel htmlFor="transfer" className="font-normal">
-                      Transfer
                     </FormLabel>
                   </div>
                 </RadioGroup>

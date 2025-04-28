@@ -14,7 +14,7 @@ import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group"
 import { Loader2 } from "lucide-react"
 
 const formSchema = z.object({
-  type: z.enum(["expense", "income", "transfer"]),
+  type: z.enum(["expense", "income"]),
   amount: z
     .string()
     .min(1, "Amount is required")
@@ -47,7 +47,7 @@ export function AddTransactionForm({ onSuccess }: AddTransactionFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingCategories, setIsLoadingCategories] = useState(true)
   const [categories, setCategories] = useState<Category[]>([])
-  const [transactionType, setTransactionType] = useState<"expense" | "income" | "transfer">("expense")
+  const [transactionType, setTransactionType] = useState<"expense" | "income">("expense")
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -169,7 +169,7 @@ export function AddTransactionForm({ onSuccess }: AddTransactionFormProps) {
               <FormLabel>Transaction Type</FormLabel>
               <FormControl>
                 <RadioGroup
-                  onValueChange={(value: "expense" | "income" | "transfer") => {
+                  onValueChange={(value: "expense" | "income") => {
                     field.onChange(value)
                     setTransactionType(value)
                     form.setValue("category", "")
@@ -187,12 +187,6 @@ export function AddTransactionForm({ onSuccess }: AddTransactionFormProps) {
                     <RadioGroupItem value="income" id="income" />
                     <FormLabel htmlFor="income" className="font-normal">
                       Income
-                    </FormLabel>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="transfer" id="transfer" />
-                    <FormLabel htmlFor="transfer" className="font-normal">
-                      Transfer
                     </FormLabel>
                   </div>
                 </RadioGroup>

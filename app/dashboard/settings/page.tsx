@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../..
 import { Button } from "../../../components/ui/button"
 import { useToast } from "../../../components/ui/use-toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs"
-import { Loader2, Save } from "lucide-react"
+import { Loader2, Save, Bell, Database } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -19,6 +19,7 @@ import { DeleteAccount } from "../../../components/settings/delete-account"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useTheme } from "next-themes"
 import { useCurrencyContext } from "../../../components/currency-provider"
+import { useDeviceType, useIsMobileDevice, DeviceResponsive } from "../../../components/device-responsive"
 
 const preferencesFormSchema = z.object({
   currency: z.string().min(1, "Currency is required"),
@@ -36,6 +37,8 @@ export default function SettingsPage() {
   const searchParams = useSearchParams()
   const { setTheme, theme } = useTheme()
   const { currency, setCurrency } = useCurrencyContext()
+  const deviceType = useDeviceType()
+  const isMobile = useIsMobileDevice()
 
   // Local state for form values
   const [selectedTheme, setSelectedTheme] = useState(theme || "light")
@@ -210,10 +213,25 @@ export default function SettingsPage() {
       </div>
 
       <Tabs defaultValue={tabParam === 'notifications' ? 'notifications' : tabParam === 'data' ? 'data' : 'preferences'} className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="preferences">Preferences</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          <TabsTrigger value="data">Data</TabsTrigger>
+        <TabsList className={isMobile ? "w-full" : ""}>
+          <TabsTrigger value="preferences" className={isMobile ? "flex-1" : ""}>
+            {isMobile ? "" : "Preferences"}
+            <span className={isMobile ? "inline-block" : "hidden"}>
+              <Save className="h-4 w-4" />
+            </span>
+          </TabsTrigger>
+          <TabsTrigger value="notifications" className={isMobile ? "flex-1" : ""}>
+            {isMobile ? "" : "Notifications"}
+            <span className={isMobile ? "inline-block" : "hidden"}>
+              <Bell className="h-4 w-4" />
+            </span>
+          </TabsTrigger>
+          <TabsTrigger value="data" className={isMobile ? "flex-1" : ""}>
+            {isMobile ? "" : "Data"}
+            <span className={isMobile ? "inline-block" : "hidden"}>
+              <Database className="h-4 w-4" />
+            </span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="preferences" className="space-y-4">
@@ -230,46 +248,63 @@ export default function SettingsPage() {
               ) : (
                 <Form {...preferencesForm}>
                   <form onSubmit={preferencesForm.handleSubmit(onPreferencesSubmit)} className="space-y-6">
-                    <FormField
-                      control={preferencesForm.control}
-                      name="currency"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Currency</FormLabel>
-                          <FixedCurrencySelector
-                            onChange={(value) => {
-                              // Only update the form value, not the actual currency yet
-                              field.onChange(value);
-                              console.log("Currency selected (not saved yet):", value);
-                            }}
-                          />
-                          <FormDescription>Select the currency to use for displaying amounts</FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <DeviceResponsive
+                      styles={{
+                        "iPhone 5/SE": "space-y-4",
+                        "iPhone 4": "space-y-4",
+                        "Nokia Lumia 520": "space-y-4",
+                        "Nokia N9": "space-y-4"
+                      }}
+                    >
+                      <FormField
+                        control={preferencesForm.control}
+                        name="currency"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Currency</FormLabel>
+                            <FixedCurrencySelector
+                              onChange={(value) => {
+                                // Only update the form value, not the actual currency yet
+                                field.onChange(value);
+                                console.log("Currency selected (not saved yet):", value);
+                              }}
+                            />
+                            <FormDescription className={isMobile ? "text-xs" : ""}>
+                              Select the currency to use for displaying amounts across all transactions, analytics, and budgets
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                    <FormField
-                      control={preferencesForm.control}
-                      name="theme"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Theme</FormLabel>
-                          <ThemeSelector
-                            value={field.value}
-                            onValueChange={(value) => {
-                              // Only update the form value, not the actual theme yet
-                              field.onChange(value);
-                              console.log("Theme selected (not saved yet):", value);
-                            }}
-                          />
-                          <FormDescription>Choose your preferred theme</FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                      <FormField
+                        control={preferencesForm.control}
+                        name="theme"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Theme</FormLabel>
+                            <ThemeSelector
+                              value={field.value}
+                              onValueChange={(value) => {
+                                // Only update the form value, not the actual theme yet
+                                field.onChange(value);
+                                console.log("Theme selected (not saved yet):", value);
+                              }}
+                            />
+                            <FormDescription className={isMobile ? "text-xs" : ""}>
+                              Choose your preferred theme for the application interface
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </DeviceResponsive>
 
-                    <Button type="submit" disabled={isSaving}>
+                    <Button
+                      type="submit"
+                      disabled={isSaving}
+                      className={`${isMobile ? "w-full" : ""}`}
+                    >
                       {isSaving ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -282,6 +317,9 @@ export default function SettingsPage() {
                         </>
                       )}
                     </Button>
+                    <div className={`text-xs text-muted-foreground mt-2 ${isMobile ? "block" : "hidden"}`}>
+                      Changes will be applied across all parts of the application when you save
+                    </div>
                   </form>
                 </Form>
               )}

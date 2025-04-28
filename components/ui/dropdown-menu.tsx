@@ -69,7 +69,18 @@ const DropdownMenuContent = React.forwardRef<
         className
       )}
       {...props}
-    />
+    >
+      {/* Add visually hidden label for accessibility */}
+      {!React.Children.toArray(props.children).some(
+        child => React.isValidElement(child) &&
+                child.type === DropdownMenuLabel
+      ) && (
+        <DropdownMenuPrimitive.Label className="sr-only">
+          Dropdown Menu
+        </DropdownMenuPrimitive.Label>
+      )}
+      {props.children}
+    </DropdownMenuPrimitive.Content>
   </DropdownMenuPrimitive.Portal>
 ))
 DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName

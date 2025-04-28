@@ -70,7 +70,7 @@ export default function Home() {
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </Link>
-                  <Link href="#features">
+                  <Link href="/about">
                     <Button variant="outline" className="px-8 ml-0 mt-2 min-[400px]:ml-4 min-[400px]:mt-0">
                       Learn More
                     </Button>
@@ -137,6 +137,73 @@ export default function Home() {
             </div>
           </div>
         </section>
+        {/* Why Choose Us Section */}
+        <section className="w-full py-12 md:py-24 bg-gradient-to-b from-emerald-50 to-white">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center">
+              <div className="inline-block px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-sm font-medium mb-2">
+                Why Choose FinTrack+
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Your Financial Journey Made Simple</h2>
+                <p className="max-w-[900px] text-gray-600 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                  We've designed FinTrack+ with your financial success in mind
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12 max-w-5xl mx-auto">
+              <div className="flex flex-col space-y-2">
+                <div className="flex items-center space-x-3">
+                  <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
+                    <Lock className="h-5 w-5 text-emerald-600" />
+                  </div>
+                  <h3 className="text-xl font-bold">Secure & Private</h3>
+                </div>
+                <p className="text-gray-600 pl-13">
+                  Your financial data is encrypted and protected with the highest security standards. We never share your information with third parties.
+                </p>
+              </div>
+
+              <div className="flex flex-col space-y-2">
+                <div className="flex items-center space-x-3">
+                  <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
+                    <Calendar className="h-5 w-5 text-emerald-600" />
+                  </div>
+                  <h3 className="text-xl font-bold">Flexible Budgeting</h3>
+                </div>
+                <p className="text-gray-600 pl-13">
+                  Create daily, weekly, monthly, or yearly budgets that adapt to your lifestyle and financial goals.
+                </p>
+              </div>
+
+              <div className="flex flex-col space-y-2">
+                <div className="flex items-center space-x-3">
+                  <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
+                    <ChartPieIcon className="h-5 w-5 text-emerald-600" />
+                  </div>
+                  <h3 className="text-xl font-bold">Insightful Analytics</h3>
+                </div>
+                <p className="text-gray-600 pl-13">
+                  Gain valuable insights into your spending habits with beautiful, easy-to-understand charts and reports.
+                </p>
+              </div>
+
+              <div className="flex flex-col space-y-2">
+                <div className="flex items-center space-x-3">
+                  <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
+                    <DollarSign className="h-5 w-5 text-emerald-600" />
+                  </div>
+                  <h3 className="text-xl font-bold">Multi-Currency Support</h3>
+                </div>
+                <p className="text-gray-600 pl-13">
+                  Track your finances in multiple currencies, perfect for travelers, expats, or international businesses.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section id="features" className="w-full py-12 md:py-24 lg:py-32 bg-gray-50">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
@@ -250,6 +317,145 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* Testimonials Section */}
+        <section className="w-full py-12 md:py-24 bg-white">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center">
+              <div className="inline-block px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-sm font-medium mb-2">
+                What Our Users Say
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Trusted by Thousands</h2>
+                <p className="max-w-[900px] text-gray-600 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                  See how FinTrack+ has helped people take control of their financial future
+                </p>
+              </div>
+            </div>
+
+            <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 md:grid-cols-3 lg:gap-12 mt-12">
+              {/* Testimonial 1 */}
+              <div className="flex flex-col space-y-4 rounded-xl border border-emerald-100 bg-white p-6 shadow-md">
+                <div className="flex items-center space-x-4">
+                  <div className="h-12 w-12 rounded-full bg-emerald-100 flex items-center justify-center">
+                    <span className="text-emerald-600 font-bold">JD</span>
+                  </div>
+                  <div>
+                    <h4 className="font-bold">John Doe</h4>
+                    <p className="text-sm text-gray-500">Small Business Owner</p>
+                  </div>
+                </div>
+                <p className="italic text-gray-600">
+                  "FinTrack+ has completely transformed how I manage both my personal and business finances. The insights I get from the analytics have helped me save over $5,000 this year alone."
+                </p>
+                <div className="flex text-emerald-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Testimonial 2 */}
+              <div className="flex flex-col space-y-4 rounded-xl border border-emerald-100 bg-white p-6 shadow-md">
+                <div className="flex items-center space-x-4">
+                  <div className="h-12 w-12 rounded-full bg-emerald-100 flex items-center justify-center">
+                    <span className="text-emerald-600 font-bold">SJ</span>
+                  </div>
+                  <div>
+                    <h4 className="font-bold">Sarah Johnson</h4>
+                    <p className="text-sm text-gray-500">Financial Advisor</p>
+                  </div>
+                </div>
+                <p className="italic text-gray-600">
+                  "I recommend FinTrack+ to all my clients. The budgeting tools are intuitive and the expense tracking makes it easy to identify spending patterns. It's a game-changer for financial planning."
+                </p>
+                <div className="flex text-emerald-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Testimonial 3 */}
+              <div className="flex flex-col space-y-4 rounded-xl border border-emerald-100 bg-white p-6 shadow-md">
+                <div className="flex items-center space-x-4">
+                  <div className="h-12 w-12 rounded-full bg-emerald-100 flex items-center justify-center">
+                    <span className="text-emerald-600 font-bold">MP</span>
+                  </div>
+                  <div>
+                    <h4 className="font-bold">Michael Patel</h4>
+                    <p className="text-sm text-gray-500">Graduate Student</p>
+                  </div>
+                </div>
+                <p className="italic text-gray-600">
+                  "As a student with limited income, FinTrack+ has been essential for managing my finances. The budget alerts keep me on track, and I've finally started building my emergency fund."
+                </p>
+                <div className="flex text-emerald-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            {/* Financial Quotes */}
+            <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+              <div className="p-6 border-l-4 border-emerald-500 bg-emerald-50 rounded-r-md">
+                <p className="italic text-gray-700 text-lg">"The habit of saving is itself an education; it fosters every virtue, teaches self-denial, cultivates the sense of order, trains to forethought, and so broadens the mind."</p>
+                <p className="text-sm text-gray-500 mt-2">— T.T. Munger</p>
+              </div>
+              <div className="p-6 border-l-4 border-emerald-500 bg-emerald-50 rounded-r-md">
+                <p className="italic text-gray-700 text-lg">"Financial peace isn't the acquisition of stuff. It's learning to live on less than you make, so you can give money back and have money to invest."</p>
+                <p className="text-sm text-gray-500 mt-2">— Dave Ramsey</p>
+              </div>
+            </div>
+
+            <div className="flex justify-center mt-12">
+              <Link href="/register">
+                <Button className="px-8 bg-emerald-600 hover:bg-emerald-700 text-white">
+                  Join Thousands of Happy Users
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </section>
       </main>
       <footer className="border-t">
         <div className="container flex flex-col gap-4 py-10 md:flex-row md:gap-8 md:py-12 px-4 md:px-6">
@@ -274,7 +480,7 @@ export default function Home() {
               Budgeting
             </Link>
           </nav>
-          <p className="text-sm text-gray-500 md:ml-auto">© 2023 FinTrack+. All rights reserved.</p>
+          <p className="text-sm text-gray-500 md:ml-auto">© {new Date().getFullYear()} FinTrack+. All rights reserved.</p>
         </div>
       </footer>
     </div>

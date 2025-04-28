@@ -117,13 +117,13 @@ export function TransactionFilters({ filters, onFilterChange, categories }: Tran
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 border-0" align="start">
+            <PopoverContent className="p-0 border-0 w-auto" align="start">
               <Calendar
                 mode="single"
                 selected={startDate}
                 onSelect={handleStartDateSelect}
                 initialFocus
-                className="rounded-md border-0 shadow-none"
+                className="border-0 shadow-none"
                 fromYear={new Date().getFullYear() - 10}
                 toYear={new Date().getFullYear() + 10}
               />
@@ -154,13 +154,13 @@ export function TransactionFilters({ filters, onFilterChange, categories }: Tran
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 border-0" align="start">
+            <PopoverContent className="p-0 border-0 w-auto" align="start">
               <Calendar
                 mode="single"
                 selected={endDate}
                 onSelect={handleEndDateSelect}
                 initialFocus
-                className="rounded-md border-0 shadow-none"
+                className="border-0 shadow-none"
                 fromYear={new Date().getFullYear() - 10}
                 toYear={new Date().getFullYear() + 10}
               />

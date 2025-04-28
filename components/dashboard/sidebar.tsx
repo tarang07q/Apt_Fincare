@@ -40,11 +40,14 @@ const navItems = [
   },
 ]
 
-export function DashboardSidebar() {
+export function DashboardSidebar({ isMobile }: { isMobile?: boolean } = {}) {
   const pathname = usePathname()
 
   return (
-    <div className="hidden border-r bg-gray-50/40 md:block dark:bg-gray-800/40">
+    <div className={cn(
+      "border-r bg-gray-50/40 dark:bg-gray-800/40",
+      isMobile ? "block w-full" : "hidden md:block"
+    )}>
       <div className="flex h-full max-h-screen flex-col gap-2">
         <div className="flex h-14 items-center border-b px-4">
           <Link href="/dashboard" className="flex items-center gap-2 font-semibold">

@@ -51,7 +51,7 @@ export function DashboardHeader() {
           </Button>
         </SheetTrigger>
         <SheetContent side="left" className="w-72 p-0">
-          <DashboardSidebar />
+          <DashboardSidebar isMobile={true} />
         </SheetContent>
       </Sheet>
       <div className="flex-1"></div>

@@ -1,80 +1,241 @@
 "use client"
 
 import * as React from "react"
-import { useState } from "react"
-import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react"
-import { DayPicker } from "react-day-picker"
-import { format } from "date-fns"
-
+import { ChevronLeft, ChevronRight } from "lucide-react"
+import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addDays } from "date-fns"
 import { cn } from "../../lib/utils"
-import { buttonVariants } from "../../components/ui/button"
+import { Button } from "../../components/ui/button"
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker>
+export interface CalendarProps {
+  mode?: "single" | "range" | "multiple"
+  selected?: Date | Date[] | undefined
+  onSelect?: (date: Date | undefined) => void
+  className?: string
+  disabled?: boolean
+  initialFocus?: boolean
+  fromYear?: number
+  toYear?: number
+}
 
-function Calendar({
+export function Calendar({
+  mode = "single",
+  selected,
+  onSelect,
   className,
-  classNames,
-  showOutsideDays = true,
-  ...props
+  disabled = false,
+  initialFocus = false,
+  fromYear,
+  toYear,
 }: CalendarProps) {
-  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
-  const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth());
-  const [isYearSelectOpen, setIsYearSelectOpen] = useState(false);
+  const [currentMonth, setCurrentMonth] = React.useState<Date>(selected && !Array.isArray(selected) ? selected : new Date())
+  const [isYearSelectOpen, setIsYearSelectOpen] = React.useState(false)
+  const [isMonthSelectOpen, setIsMonthSelectOpen] = React.useState(false)
+  const yearSelectorRef = React.useRef<HTMLDivElement>(null)
+  const monthSelectorRef = React.useRef<HTMLDivElement>(null)
 
-  // Generate years for selection (10 years before and after current year)
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 21 }, (_, i) => currentYear - 10 + i);
+  // Generate years for selection
+  const currentYear = new Date().getFullYear()
+  const startYear = fromYear || currentYear - 10
+  const endYear = toYear || currentYear + 10
+  const years = React.useMemo(() => {
+    return Array.from({ length: endYear - startYear + 1 }, (_, i) => startYear + i)
+  }, [startYear, endYear])
+
+  // Months for selection
+  const months = React.useMemo(() => {
+    return [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ]
+  }, [])
+
+  // Days of the week
+  const daysOfWeek = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
+
+  // Generate days for the current month
+  const days = React.useMemo(() => {
+    const firstDayOfMonth = startOfMonth(currentMonth)
+    const lastDayOfMonth = endOfMonth(currentMonth)
+
+    // Get days from previous month to fill the first row
+    const daysInPreviousMonth = firstDayOfMonth.getDay()
+    const previousMonthDays = daysInPreviousMonth > 0
+      ? eachDayOfInterval({
+          start: subMonths(addDays(firstDayOfMonth, -daysInPreviousMonth), 0),
+          end: subMonths(addDays(firstDayOfMonth, -1), 0)
+        })
+      : []
+
+    // Get days from current month
+    const currentMonthDays = eachDayOfInterval({ start: firstDayOfMonth, end: lastDayOfMonth })
+
+    // Get days from next month to fill the last row
+    const daysInNextMonth = 6 - lastDayOfMonth.getDay()
+    const nextMonthDays = daysInNextMonth > 0
+      ? eachDayOfInterval({
+          start: addMonths(addDays(lastDayOfMonth, 1), 0),
+          end: addMonths(addDays(lastDayOfMonth, daysInNextMonth), 0)
+        })
+      : []
+
+    return [...previousMonthDays, ...currentMonthDays, ...nextMonthDays]
+  }, [currentMonth])
+
+  // Close selectors when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (yearSelectorRef.current && !yearSelectorRef.current.contains(event.target as Node)) {
+        setIsYearSelectOpen(false)
+      }
+      if (monthSelectorRef.current && !monthSelectorRef.current.contains(event.target as Node)) {
+        setIsMonthSelectOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
+
+  // Handle month navigation
+  const handlePreviousMonth = () => {
+    setCurrentMonth(prev => subMonths(prev, 1))
+  }
+
+  const handleNextMonth = () => {
+    setCurrentMonth(prev => addMonths(prev, 1))
+  }
 
   // Handle year selection
   const handleYearSelect = (year: number) => {
-    setSelectedYear(year);
-    setIsYearSelectOpen(false);
+    setCurrentMonth(new Date(year, currentMonth.getMonth(), 1))
+    setIsYearSelectOpen(false)
+  }
 
-    // Update the month in DayPicker
-    if (props.onMonthChange) {
-      const newDate = new Date(year, selectedMonth, 1);
-      props.onMonthChange(newDate);
+  // Handle month selection
+  const handleMonthSelect = (monthIndex: number) => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), monthIndex, 1))
+    setIsMonthSelectOpen(false)
+  }
+
+  // Handle date selection
+  const handleDateSelect = (date: Date) => {
+    if (disabled) return
+    if (onSelect) {
+      onSelect(date)
     }
-  };
+  }
 
-  // Handle month change from DayPicker
-  const handleMonthChange = (date: Date) => {
-    setSelectedMonth(date.getMonth());
-    setSelectedYear(date.getFullYear());
+  // Check if a date is selected
+  const isSelected = (date: Date) => {
+    if (!selected) return false
 
-    if (props.onMonthChange) {
-      props.onMonthChange(date);
+    if (Array.isArray(selected)) {
+      return selected.some(selectedDate => isSameDay(selectedDate, date))
     }
-  };
 
-  // Custom caption component with year selection
-  const CustomCaption = ({ displayMonth }: { displayMonth: Date }) => {
-    return (
-      <div className="flex justify-center items-center space-x-1 relative">
-        <div className="flex items-center">
-          <span className="text-sm font-medium text-foreground dark:text-gray-200">
-            {format(displayMonth, 'MMMM')}
-          </span>
-          <div className="relative ml-1">
+    return isSameDay(selected, date)
+  }
+
+  // Check if a date is today
+  const isToday = (date: Date) => {
+    return isSameDay(date, new Date())
+  }
+
+  // Group days into weeks
+  const weeks = React.useMemo(() => {
+    const result = []
+    for (let i = 0; i < days.length; i += 7) {
+      result.push(days.slice(i, i + 7))
+    }
+    return result
+  }, [days])
+
+  return (
+    <div className={cn("p-3 bg-card border rounded-md shadow-md dark:bg-gray-800", className)}>
+      {/* Header with month/year selector and navigation */}
+      <div className="flex justify-between items-center mb-4">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handlePreviousMonth}
+          className="h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 dark:border-gray-600 dark:hover:bg-gray-700"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+
+        <div className="flex space-x-1">
+          {/* Month selector */}
+          <div className="relative">
             <button
               type="button"
-              onClick={() => setIsYearSelectOpen(!isYearSelectOpen)}
+              onClick={() => {
+                setIsMonthSelectOpen(!isMonthSelectOpen)
+                setIsYearSelectOpen(false)
+              }}
               className="inline-flex items-center px-2 py-1 text-sm font-medium text-foreground dark:text-gray-200 hover:bg-accent hover:text-accent-foreground dark:hover:bg-gray-700 rounded-md"
             >
-              {format(displayMonth, 'yyyy')}
-              <ChevronDown className="ml-1 h-4 w-4" />
+              <span className="font-semibold">{format(currentMonth, 'MMMM')}</span>
+              <svg className="ml-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </button>
+
+            {isMonthSelectOpen && (
+              <div
+                ref={monthSelectorRef}
+                className="absolute z-50 top-10 left-0 max-h-60 w-36 overflow-auto rounded-md bg-card border border-input shadow-md dark:bg-gray-800 dark:border-gray-700"
+              >
+                <div className="p-1">
+                  {months.map((month, index) => (
+                    <button
+                      key={month}
+                      onClick={() => handleMonthSelect(index)}
+                      className={cn(
+                        "w-full text-left px-2 py-1 text-sm rounded-md text-foreground dark:text-gray-200",
+                        index === currentMonth.getMonth()
+                          ? "bg-emerald-600 text-white dark:bg-emerald-500"
+                          : "hover:bg-accent hover:text-accent-foreground dark:hover:bg-gray-700"
+                      )}
+                    >
+                      {month}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Year selector */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => {
+                setIsYearSelectOpen(!isYearSelectOpen)
+                setIsMonthSelectOpen(false)
+              }}
+              className="inline-flex items-center px-2 py-1 text-sm font-medium text-foreground dark:text-gray-200 hover:bg-accent hover:text-accent-foreground dark:hover:bg-gray-700 rounded-md"
+            >
+              <span className="font-semibold">{format(currentMonth, 'yyyy')}</span>
+              <svg className="ml-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
             </button>
 
             {isYearSelectOpen && (
-              <div className="absolute z-50 mt-1 max-h-60 w-24 overflow-auto rounded-md bg-card border border-input shadow-md dark:bg-gray-800 dark:border-gray-700">
-                <div className="p-1 grid grid-cols-2 gap-1">
+              <div
+                ref={yearSelectorRef}
+                className="absolute z-50 top-10 left-0 max-h-60 w-36 overflow-auto rounded-md bg-card border border-input shadow-md dark:bg-gray-800 dark:border-gray-700"
+              >
+                <div className="p-1 grid grid-cols-3 gap-1">
                   {years.map((year) => (
                     <button
                       key={year}
                       onClick={() => handleYearSelect(year)}
                       className={cn(
                         "px-2 py-1 text-sm rounded-md text-foreground dark:text-gray-200",
-                        year === selectedYear
+                        year === currentMonth.getFullYear()
                           ? "bg-emerald-600 text-white dark:bg-emerald-500"
                           : "hover:bg-accent hover:text-accent-foreground dark:hover:bg-gray-700"
                       )}
@@ -87,58 +248,58 @@ function Calendar({
             )}
           </div>
         </div>
-      </div>
-    );
-  };
 
-  return (
-    <DayPicker
-      showOutsideDays={showOutsideDays}
-      className={cn("p-3 bg-card border rounded-md shadow-md dark:bg-gray-800", className)}
-      classNames={{
-        months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-        month: "space-y-4",
-        caption: "flex justify-center pt-1 relative items-center h-10",
-        caption_label: "hidden", // Hide default caption label since we're using custom caption
-        nav: "space-x-1 flex items-center",
-        nav_button: cn(
-          buttonVariants({ variant: "outline" }),
-          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 dark:border-gray-600 dark:hover:bg-gray-700"
-        ),
-        nav_button_previous: "absolute left-1",
-        nav_button_next: "absolute right-1",
-        table: "w-full border-collapse space-y-1",
-        head_row: "grid grid-cols-7 w-full",
-        head_cell:
-          "text-muted-foreground rounded-md w-9 font-medium text-[0.8rem] text-center flex items-center justify-center",
-        row: "grid grid-cols-7 w-full mt-2",
-        cell: "h-9 w-9 text-center text-sm p-0 relative flex items-center justify-center [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-        day: cn(
-          buttonVariants({ variant: "ghost" }),
-          "h-9 w-9 p-0 font-normal aria-selected:opacity-100 text-foreground dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-gray-100"
-        ),
-        day_range_end: "day-range-end",
-        day_selected:
-          "bg-emerald-600 text-white hover:bg-emerald-600 hover:text-white focus:bg-emerald-600 focus:text-white dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-600 rounded-full",
-        day_today: "bg-accent text-accent-foreground font-bold border border-emerald-500 dark:border-emerald-400 dark:bg-gray-700 rounded-full",
-        day_outside:
-          "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground dark:text-gray-500",
-        day_disabled: "text-muted-foreground opacity-50 dark:text-gray-600",
-        day_range_middle:
-          "aria-selected:bg-accent aria-selected:text-accent-foreground",
-        day_hidden: "invisible",
-        ...classNames,
-      }}
-      components={{
-        IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
-        IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
-        Caption: ({ displayMonth }) => <CustomCaption displayMonth={displayMonth} />
-      }}
-      onMonthChange={handleMonthChange}
-      {...props}
-    />
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handleNextMonth}
+          className="h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 dark:border-gray-600 dark:hover:bg-gray-700"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+
+      {/* Calendar grid */}
+      <table className="w-full border-collapse">
+        <thead>
+          <tr className="flex justify-between">
+            {daysOfWeek.map((day) => (
+              <th key={day} className="text-muted-foreground text-[0.8rem] font-medium text-center py-2 w-9">
+                {day}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {weeks.map((week, weekIndex) => (
+            <tr key={weekIndex} className="flex justify-between">
+              {week.map((day) => {
+                const isCurrentMonth = isSameMonth(day, currentMonth)
+                return (
+                  <td key={day.toString()} className="text-center p-0 relative h-9 w-9 flex items-center justify-center">
+                    <button
+                      type="button"
+                      onClick={() => handleDateSelect(day)}
+                      disabled={disabled || !isCurrentMonth}
+                      className={cn(
+                        "h-8 w-8 p-0 font-normal rounded-full flex items-center justify-center",
+                        isSelected(day) && "bg-emerald-600 text-white hover:bg-emerald-600 hover:text-white",
+                        isToday(day) && !isSelected(day) && "border border-emerald-500 dark:border-emerald-400",
+                        !isCurrentMonth && "text-muted-foreground opacity-50",
+                        !disabled && isCurrentMonth && !isSelected(day) && "hover:bg-accent dark:hover:bg-gray-700"
+                      )}
+                    >
+                      {format(day, 'd')}
+                    </button>
+                  </td>
+                )
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   )
 }
-Calendar.displayName = "Calendar"
 
-export { Calendar }
+Calendar.displayName = "Calendar"

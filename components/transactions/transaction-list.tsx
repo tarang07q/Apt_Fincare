@@ -25,7 +25,7 @@ import { useCurrency } from "../../hooks/useCurrency"
 type Transaction = {
   _id: string
   amount: number
-  type: "expense" | "income" | "transfer"
+  type: "expense" | "income"
   category: {
     _id: string
     name: string
@@ -156,10 +156,8 @@ export function TransactionList({ transactions, isLoading, onRefresh }: Transact
             >
               {transaction.type === "expense" ? (
                 <ArrowDownIcon className="h-5 w-5 text-rose-500" />
-              ) : transaction.type === "income" ? (
-                <ArrowUpIcon className="h-5 w-5 text-emerald-500" />
               ) : (
-                <ArrowUpIcon className="h-5 w-5 rotate-90 text-blue-500" />
+                <ArrowUpIcon className="h-5 w-5 text-emerald-500" />
               )}
             </div>
 
@@ -195,12 +193,10 @@ export function TransactionList({ transactions, isLoading, onRefresh }: Transact
                 className={`font-medium ${
                   transaction.type === "expense"
                     ? "text-rose-500"
-                    : transaction.type === "income"
-                      ? "text-emerald-500"
-                      : "text-blue-500"
+                    : "text-emerald-500"
                 }`}
               >
-                {transaction.type === "expense" ? "-" : transaction.type === "income" ? "+" : ""}
+                {transaction.type === "expense" ? "-" : "+"}
                 {formatCurrency(transaction.amount)}
               </div>
 
