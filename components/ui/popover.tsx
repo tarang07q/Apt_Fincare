@@ -24,34 +24,36 @@ const PopoverContent = React.forwardRef<
       )}
       {...props}
     >
-      {/* Add visually hidden title and description for accessibility */}
-      {!React.Children.toArray(props.children).some(
-        child => React.isValidElement(child) &&
-                child.type === PopoverPrimitive.Title
-      ) && (
-        <PopoverPrimitive.Title className="sr-only">
-          Popover
-        </PopoverPrimitive.Title>
-      )}
-      {!React.Children.toArray(props.children).some(
-        child => React.isValidElement(child) &&
-                child.type === PopoverPrimitive.Description
-      ) && (
-        <PopoverPrimitive.Description className="sr-only">
-          Popover Description
-        </PopoverPrimitive.Description>
-      )}
       {props.children}
     </PopoverPrimitive.Content>
   </PopoverPrimitive.Portal>
 ))
 PopoverContent.displayName = PopoverPrimitive.Content.displayName
 
-const PopoverTitle = PopoverPrimitive.Title
-PopoverTitle.displayName = PopoverPrimitive.Title.displayName
+// Create custom Title and Description components since they're not exported from Radix UI
+const PopoverTitle = React.forwardRef<
+  HTMLHeadingElement,
+  React.HTMLAttributes<HTMLHeadingElement>
+>(({ className, ...props }, ref) => (
+  <h3
+    ref={ref}
+    className={cn("text-sm font-medium", className)}
+    {...props}
+  />
+))
+PopoverTitle.displayName = "PopoverTitle"
 
-const PopoverDescription = PopoverPrimitive.Description
-PopoverDescription.displayName = PopoverPrimitive.Description.displayName
+const PopoverDescription = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLParagraphElement>
+>(({ className, ...props }, ref) => (
+  <p
+    ref={ref}
+    className={cn("text-sm text-muted-foreground", className)}
+    {...props}
+  />
+))
+PopoverDescription.displayName = "PopoverDescription"
 
 export {
   Popover,
