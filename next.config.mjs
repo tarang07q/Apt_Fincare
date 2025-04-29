@@ -13,6 +13,7 @@ try {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -23,7 +24,8 @@ const nextConfig = {
     unoptimized: true,
   },
   // Add asset prefix for static files
-  assetPrefix: process.env.NODE_ENV === 'production' ? undefined : '',
+  assetPrefix: process.env.NODE_ENV === 'production' ? '/Apt_Fincare' : '',
+  basePath: process.env.NODE_ENV === 'production' ? '/Apt_Fincare' : '',
   // Ensure CSS modules work correctly
   webpack: (config) => {
     return config;
