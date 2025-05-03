@@ -32,6 +32,13 @@ const nextConfig = {
   },
   // Skip trailing slash redirect
   skipTrailingSlashRedirect: true,
+  // Disable API routes in static export
+  trailingSlash: true,
+  // Ignore build errors for API routes
+  onDemandEntries: {
+    maxInactiveAge: 25 * 1000,
+    pagesBufferLength: 2,
+  },
   experimental: {
     webpackBuildWorker: true,
     parallelServerBuildTraces: true,

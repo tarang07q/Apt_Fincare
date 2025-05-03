@@ -24,7 +24,14 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: npm run build
+        run: |
+          # Set environment variables for Next.js
+          echo "NEXTAUTH_URL=https://tarang07q.github.io/Apt_Fincare" >> .env.production
+          echo "NEXTAUTH_SECRET=TWPJQGsS1m1Q59Ts1AIgqMbnPBQy+b8zdyWz/zVILFs=" >> .env.production
+          echo "RESEND_API_KEY=dummy_key_for_static_build" >> .env.production
+
+          # Build the application
+          npm run build
         env:
           NODE_ENV: production
 
@@ -36,3 +43,4 @@ jobs:
         with:
           folder: out
           branch: gh-pages
+          clean: true
