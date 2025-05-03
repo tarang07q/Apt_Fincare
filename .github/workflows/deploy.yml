@@ -4,9 +4,31 @@ on:
   push:
     branches:
       - main
+  # Allow manual triggering
+  workflow_dispatch:
 
 jobs:
+  # First job: clean up previous deployments
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Delete gh-pages branch if it exists
+        run: |
+          git fetch origin
+          if git ls-remote --heads origin gh-pages | grep gh-pages; then
+            git push origin --delete gh-pages || echo "Branch not found or already deleted"
+          else
+            echo "Branch gh-pages does not exist, skipping deletion"
+          fi
+
+  # Second job: build and deploy
   build-and-deploy:
+    needs: cleanup
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -35,8 +57,11 @@ jobs:
         env:
           NODE_ENV: production
 
-      - name: Add .nojekyll file
-        run: touch out/.nojekyll
+      - name: Add .nojekyll file and modify HTML
+        run: |
+          touch out/.nojekyll
+          mkdir -p scripts
+          node scripts/modify-html.js || echo "Failed to modify HTML, continuing anyway"
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
@@ -44,3 +69,4 @@ jobs:
           folder: out
           branch: gh-pages
           clean: true
+          force: true
