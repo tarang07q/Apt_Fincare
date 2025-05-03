@@ -8,30 +8,15 @@ on:
   workflow_dispatch:
 
 jobs:
-  # First job: clean up previous deployments
-  cleanup:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Delete gh-pages branch if it exists
-        run: |
-          git fetch origin
-          if git ls-remote --heads origin gh-pages | grep gh-pages; then
-            git push origin --delete gh-pages || echo "Branch not found or already deleted"
-          else
-            echo "Branch gh-pages does not exist, skipping deletion"
-          fi
-
-  # Second job: build and deploy
   build-and-deploy:
-    needs: cleanup
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -45,10 +30,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+
       - name: Build
         run: |
           # Set environment variables for Next.js
-          echo "NEXTAUTH_URL=https://tarang07q.github.io/Apt_Fincare" >> .env.production
+          echo "NEXTAUTH_URL=https://tarang07q.github.io/Apt_Fincare" > .env.production
           echo "NEXTAUTH_SECRET=TWPJQGsS1m1Q59Ts1AIgqMbnPBQy+b8zdyWz/zVILFs=" >> .env.production
           echo "RESEND_API_KEY=dummy_key_for_static_build" >> .env.production
 
@@ -57,16 +45,14 @@ jobs:
         env:
           NODE_ENV: production
 
-      - name: Add .nojekyll file and modify HTML
-        run: |
-          touch out/.nojekyll
-          mkdir -p scripts
-          node scripts/modify-html.js || echo "Failed to modify HTML, continuing anyway"
+      - name: Add .nojekyll file
+        run: touch out/.nojekyll
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: ./out
 
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: out
-          branch: gh-pages
-          clean: true
-          force: true
+        id: deployment
+        uses: actions/deploy-pages@v2
