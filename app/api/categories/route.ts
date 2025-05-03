@@ -4,6 +4,8 @@ import { connectToDatabase } from "../../../lib/mongodb"
 import { Category } from "../../../models/category"
 import { authOptions } from "../auth/[...nextauth]/route"
 
+export const dynamic = "force-static"
+
 export async function GET() {
   try {
     const session = await getServerSession(authOptions)

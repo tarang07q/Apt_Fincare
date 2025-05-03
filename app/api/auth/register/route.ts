@@ -4,6 +4,8 @@ import { hash } from "bcryptjs"
 import { User } from "../../../../models/user"
 import { Category } from "../../../../models/category"
 
+export const dynamic = "force-static"
+
 // Default categories to create for new users
 const defaultCategories = [
   { name: "Groceries", icon: "shopping-cart", color: "#10b981", type: "expense", isDefault: true },

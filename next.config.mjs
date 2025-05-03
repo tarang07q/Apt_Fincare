@@ -30,6 +30,8 @@ const nextConfig = {
   webpack: (config) => {
     return config;
   },
+  // Skip trailing slash redirect
+  skipTrailingSlashRedirect: true,
   experimental: {
     webpackBuildWorker: true,
     parallelServerBuildTraces: true,

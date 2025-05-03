@@ -8,6 +8,8 @@ import { authOptions } from "../auth/[...nextauth]/route"
 import { convertCurrency, convertToUSD } from "../../../lib/currency"
 import { sendTransactionAlert } from "../../../lib/notifications"
 
+export const dynamic = "force-static"
+
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions)

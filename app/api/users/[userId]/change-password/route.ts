@@ -7,6 +7,8 @@ import { compare, hash } from "bcryptjs"
 import { sendAccountActivityAlert } from "../../../../../lib/notifications"
 import { sendPasswordChangedEmail } from "../../../../../lib/resend"
 
+export const dynamic = "force-static"
+
 export async function POST(
   request: Request,
   { params }: { params: { userId: string } }
@@ -68,7 +70,7 @@ export async function POST(
         "Password Changed",
         `Your password has been successfully changed. If you didn't make this change, please contact support immediately.`
       )
-      
+
       // Send email confirmation
       await sendPasswordChangedEmail(user.email)
     } catch (notificationError) {

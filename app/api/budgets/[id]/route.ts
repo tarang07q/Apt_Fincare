@@ -5,6 +5,8 @@ import { Budget } from "../../../../models/budget"
 import { Category } from "../../../../models/category"
 import { authOptions } from "../../auth/[...nextauth]/route"
 
+export const dynamic = "force-static"
+
 export async function GET(
   request: Request,
   { params }: { params: { id: string } }

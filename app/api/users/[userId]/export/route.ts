@@ -8,6 +8,8 @@ import { User } from "../../../../../models/user"
 import { authOptions } from "../../../auth/[...nextauth]/route"
 import { convertCurrency } from "../../../../../lib/currency"
 
+export const dynamic = "force-static"
+
 // Helper function to convert data to CSV
 function convertToCSV(data: any[], fields: string[]) {
   try {

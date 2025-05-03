@@ -5,6 +5,8 @@ import { compare } from "bcryptjs"
 import { User } from "../../../../models/user"
 import { sendAccountActivityAlert } from "../../../../lib/notifications"
 
+export const dynamic = "force-static"
+
 export const authOptions = {
   providers: [
     CredentialsProvider({

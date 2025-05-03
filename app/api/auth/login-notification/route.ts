@@ -5,6 +5,8 @@ import { User } from "../../../../models/user"
 import { authOptions } from "../[...nextauth]/route"
 import { sendAccountActivityAlert } from "../../../../lib/notifications"
 
+export const dynamic = "force-static"
+
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions)

@@ -4,6 +4,8 @@ import { connectToDatabase } from "../../../../../lib/mongodb"
 import { User } from "../../../../../models/user"
 import { authOptions } from "../../../auth/[...nextauth]/route"
 
+export const dynamic = "force-static"
+
 // GET endpoint to fetch user notification settings
 export async function GET(
   request: Request,

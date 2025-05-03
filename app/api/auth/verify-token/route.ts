@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 import { connectToDatabase } from "../../../../lib/mongodb"
 import { User } from "../../../../models/user"
 
+export const dynamic = "force-static"
+
 export async function POST(request: Request) {
   try {
     const { token } = await request.json()
@@ -20,14 +22,14 @@ export async function POST(request: Request) {
     })
 
     if (!user) {
-      return NextResponse.json({ 
-        valid: false, 
-        message: "Password reset token is invalid or has expired" 
+      return NextResponse.json({
+        valid: false,
+        message: "Password reset token is invalid or has expired"
       })
     }
 
     // Token is valid
-    return NextResponse.json({ 
+    return NextResponse.json({
       valid: true,
       message: "Token is valid",
       email: user.email.replace(/(.{2})(.*)(?=@)/, function(_, a, b) {
@@ -36,9 +38,9 @@ export async function POST(request: Request) {
     })
   } catch (error) {
     console.error("Token verification error:", error)
-    return NextResponse.json({ 
-      valid: false, 
-      message: "An error occurred during token verification" 
+    return NextResponse.json({
+      valid: false,
+      message: "An error occurred during token verification"
     }, { status: 500 })
   }
 }
