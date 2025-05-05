@@ -8,6 +8,8 @@ import { compare } from "bcryptjs"; // Use bcryptjs instead of bcrypt
 import { Parser } from "json2csv"
 import { convertCurrency } from "../../../../lib/currency"
 
+export const dynamic = "force-dynamic"
+
 interface TransactionData {
   name: string
   month: number

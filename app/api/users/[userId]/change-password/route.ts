@@ -7,7 +7,7 @@ import { compare, hash } from "bcryptjs"
 import { sendAccountActivityAlert } from "../../../../../lib/notifications"
 import { sendPasswordChangedEmail } from "../../../../../lib/resend"
 
-export const dynamic = "force-static"
+export const dynamic = "force-dynamic"
 
 export async function POST(
   request: Request,

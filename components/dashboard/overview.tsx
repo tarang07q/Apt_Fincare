@@ -231,27 +231,28 @@ export function Overview() {
               <p className="text-muted-foreground">No data available</p>
             </div>
           ) : (
-            <div className="h-80">
+            <div className={`h-80 rounded-lg p-2 ${currentTheme === 'dark' ? 'bg-black' : 'bg-white'}`}>
               <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
+              <PieChart style={{ backgroundColor: currentTheme === 'dark' ? 'black' : 'white' }}>
                 <Pie
                   data={pieData}
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  innerRadius={40}
-                  outerRadius={80}
+                  innerRadius={60}
+                  outerRadius={90}
                   paddingAngle={2}
                   fill="#8884d8"
                   dataKey="value"
+                  nameKey="name"
                   label={false}
                 >
                   {pieData.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
                       fill={entry.color}
-                      stroke="#1a1a1a"
-                      strokeWidth={1}
+                      stroke={currentTheme === 'dark' ? '#333333' : '#ffffff'}
+                      strokeWidth={2}
                     />
                   ))}
                 </Pie>
@@ -268,12 +269,17 @@ export function Overview() {
                   align="right"
                   iconType="circle"
                   iconSize={10}
+                  wrapperStyle={{
+                    backgroundColor: currentTheme === 'dark' ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.7)',
+                    padding: '10px',
+                    borderRadius: '5px'
+                  }}
                   formatter={(value, entry) => {
                     const { color } = entry as any;
                     // Convert value to string to prevent [object Object] display
                     const valueStr = typeof value === 'string' ? value : String(value);
                     // Display only category name
-                    return <span style={{ color: color, marginLeft: '5px', fontWeight: 'bold', fontSize: '12px' }}>
+                    return <span style={{ color: currentTheme === 'dark' ? '#ffffff' : '#000000', marginLeft: '5px', fontWeight: 'bold', fontSize: '12px' }}>
                       {valueStr}
                     </span>;
                   }}

@@ -13,7 +13,8 @@ try {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
+  // Disable export for local development
+  // output: 'export',
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -23,9 +24,9 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // Add asset prefix for static files
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/Apt_Fincare' : '',
-  basePath: process.env.NODE_ENV === 'production' ? '/Apt_Fincare' : '',
+  // Remove asset prefix and basePath for local development
+  // assetPrefix: process.env.NODE_ENV === 'production' ? '/Apt_Fincare' : '',
+  // basePath: process.env.NODE_ENV === 'production' ? '/Apt_Fincare' : '',
   // Ensure CSS modules work correctly
   webpack: (config) => {
     return config;
@@ -33,9 +34,12 @@ const nextConfig = {
   // Skip trailing slash redirect
   skipTrailingSlashRedirect: true,
   trailingSlash: true,
+  // Disable server components for static export
   experimental: {
     webpackBuildWorker: true,
   },
+  // Use a custom build directory
+  distDir: '.next',
 }
 
 if (userConfig) {

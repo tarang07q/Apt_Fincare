@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { connectToDatabase } from "../../../../lib/mongodb"
 import { User } from "../../../../models/user"
 
-export const dynamic = "force-static"
+export const dynamic = "force-dynamic"
 
 export async function POST(request: Request) {
   try {

@@ -5,7 +5,7 @@ import crypto from "crypto"
 import { sendAccountActivityAlert } from "../../../../lib/notifications"
 import { sendPasswordResetEmail } from "../../../../lib/resend"
 
-export const dynamic = "force-static"
+export const dynamic = "force-dynamic"
 
 // In a real application, you would send an email with a reset link
 // For this demo, we'll just simulate the process

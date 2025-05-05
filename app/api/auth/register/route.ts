@@ -4,7 +4,7 @@ import { hash } from "bcryptjs"
 import { User } from "../../../../models/user"
 import { Category } from "../../../../models/category"
 
-export const dynamic = "force-static"
+export const dynamic = "force-dynamic"
 
 // Default categories to create for new users
 const defaultCategories = [

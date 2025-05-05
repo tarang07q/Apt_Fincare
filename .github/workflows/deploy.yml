@@ -39,9 +39,10 @@ jobs:
           echo "NEXTAUTH_URL=https://tarang07q.github.io/Apt_Fincare" > .env.production
           echo "NEXTAUTH_SECRET=TWPJQGsS1m1Q59Ts1AIgqMbnPBQy+b8zdyWz/zVILFs=" >> .env.production
           echo "RESEND_API_KEY=dummy_key_for_static_build" >> .env.production
+          echo "MONGODB_URI=mongodb://localhost:27017/fintrack-manager" >> .env.production
 
-          # Build the application
-          npm run build
+          # Create a static version of the app using our custom script
+          npm run build:static
         env:
           NODE_ENV: production
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "../../components/ui/button"
@@ -10,7 +10,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { PiggyBank } from "lucide-react"
 import { useToast } from "../../components/ui/use-toast"
 
-export default function ResetPasswordPage() {
+// Wrapper component that uses searchParams
+function ResetPasswordContent() {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -263,5 +264,37 @@ export default function ResetPasswordPage() {
         )}
       </Card>
     </div>
+  )
+}
+
+// Loading component for Suspense
+function LoadingState() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-r from-emerald-50 to-emerald-100 px-4 py-12 dark:from-gray-800 dark:to-gray-900">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="space-y-1">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <PiggyBank className="h-6 w-6 text-emerald-600" />
+            <span className="text-xl font-bold">FinTrack+</span>
+          </div>
+          <CardTitle className="text-2xl font-bold text-center">Loading</CardTitle>
+          <CardDescription className="text-center">
+            Please wait while we load the page...
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex justify-center py-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+// Main page component with Suspense
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <ResetPasswordContent />
+    </Suspense>
   )
 }

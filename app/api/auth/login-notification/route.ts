@@ -5,7 +5,7 @@ import { User } from "../../../../models/user"
 import { authOptions } from "../[...nextauth]/route"
 import { sendAccountActivityAlert } from "../../../../lib/notifications"
 
-export const dynamic = "force-static"
+export const dynamic = "force-dynamic"
 
 export async function POST(request: Request) {
   try {

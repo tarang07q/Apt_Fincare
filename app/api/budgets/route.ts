@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth/next"
 import { connectToDatabase } from "../../../lib/mongodb"
-import { Budget } from "../../../models/budget"
+import { Budget, getBudgetModel } from "../../../models/budget"
+import { Category, getCategoryModel } from "../../../models/category"
 import { authOptions } from "../auth/[...nextauth]/route"
 
-export const dynamic = "force-static"
+export const dynamic = "force-dynamic"
 
 export async function GET() {
   try {
@@ -17,8 +18,12 @@ export async function GET() {
     // Connect to database
     await connectToDatabase()
 
+    // Get the models
+    const BudgetModel = await getBudgetModel()
+    const CategoryModel = await getCategoryModel()
+
     // Get budgets for the user
-    const budgets = await Budget.find({
+    const budgets = await BudgetModel.find({
       userId: session.user.id,
     }).populate("category")
 
@@ -47,8 +52,12 @@ export async function POST(request: Request) {
     // Connect to database
     await connectToDatabase()
 
+    // Get the models
+    const BudgetModel = await getBudgetModel()
+    const CategoryModel = await getCategoryModel()
+
     // Check if budget already exists for this category and period
-    const existingBudget = await Budget.findOne({
+    const existingBudget = await BudgetModel.findOne({
       userId: session.user.id,
       category,
       period,
@@ -59,7 +68,7 @@ export async function POST(request: Request) {
     }
 
     // Create new budget
-    const newBudget = new Budget({
+    const newBudget = new BudgetModel({
       userId: session.user.id,
       category,
       amount: Number.parseFloat(amount),

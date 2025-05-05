@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth/next"
 import { connectToDatabase } from "../../../../lib/mongodb"
-import { Budget } from "../../../../models/budget"
-import { Transaction } from "../../../../models/transaction"
-import { User } from "../../../../models/user"
+import { Budget, getBudgetModel } from "../../../../models/budget"
+import { Transaction, getTransactionModel } from "../../../../models/transaction"
+import { User, getUserModel } from "../../../../models/user"
+import { Category, getCategoryModel } from "../../../../models/category"
 import { authOptions } from "../../auth/[...nextauth]/route"
 import { convertCurrency } from "../../../../lib/currency"
 import { sendBudgetAlert } from "../../../../lib/notifications"
 
-export const dynamic = "force-static"
+export const dynamic = "force-dynamic"
 
 export async function GET(request: Request) {
   try {
@@ -25,9 +26,15 @@ export async function GET(request: Request) {
     // Connect to database
     await connectToDatabase()
 
+    // Get the models
+    const BudgetModel = await getBudgetModel()
+    const TransactionModel = await getTransactionModel()
+    const UserModel = await getUserModel()
+    const CategoryModel = await getCategoryModel()
+
     // If no currency specified, get user's preferred currency
     if (!searchParams.has("currency")) {
-      const user = await User.findById(session.user.id)
+      const user = await UserModel.findById(session.user.id)
       if (user?.preferences?.currency) {
         currency = user.preferences.currency
       }
@@ -37,7 +44,7 @@ export async function GET(request: Request) {
     const now = new Date()
 
     // Get active budgets for the user
-    const budgets = await Budget.find({
+    const budgets = await BudgetModel.find({
       userId: session.user.id,
       isActive: true,
       $or: [{ endDate: { $exists: false } }, { endDate: null }, { endDate: { $gte: now } }],
@@ -100,7 +107,7 @@ export async function GET(request: Request) {
         }
 
         // Get transactions for this category and date range
-        const transactions = await Transaction.find({
+        const transactions = await TransactionModel.find({
           userId: session.user.id,
           category: budget.category._id,
           type: "expense",

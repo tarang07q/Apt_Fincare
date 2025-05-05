@@ -6,7 +6,7 @@ import { User } from "../../../../models/user"
 import { authOptions } from "../../auth/[...nextauth]/route"
 import { convertCurrency } from "../../../../lib/currency"
 
-export const dynamic = "force-static"
+export const dynamic = "force-dynamic"
 
 export async function GET(request: Request) {
   try {

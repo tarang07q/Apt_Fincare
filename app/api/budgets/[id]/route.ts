@@ -5,7 +5,7 @@ import { Budget } from "../../../../models/budget"
 import { Category } from "../../../../models/category"
 import { authOptions } from "../../auth/[...nextauth]/route"
 
-export const dynamic = "force-static"
+export const dynamic = "force-dynamic"
 
 export async function GET(
   request: Request,
