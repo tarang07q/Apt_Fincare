@@ -105,20 +105,23 @@ export async function sendBudgetAlert(userId: string, budgetName: string, curren
 /**
  * Send a transaction alert notification
  */
-export async function sendTransactionAlert(userId: string, transactionType: string, amount: number, category: string, currency: string): Promise<boolean> {
-  const action = transactionType === "income" ? "received" : "spent"
-  
+export async function sendTransactionAlert(userId: string, transactionType: string, amount: number, categoryOrMerchant: string, currency: string): Promise<boolean> {
+  const action = transactionType === "income" ? "received" : "spent";
+  const message = transactionType === "income" || transactionType === "expense"
+    ? `You ${action} ${currency}${amount} in ${categoryOrMerchant}`
+    : `New transaction: ${currency}${amount} at ${categoryOrMerchant}`;
+
   return sendNotification(userId, {
     title: "Transaction Alert",
-    message: `You ${action} ${currency}${amount} in ${category}`,
+    message,
     type: NotificationType.TRANSACTION_ALERT,
     data: {
       transactionType,
       amount,
-      category,
+      categoryOrMerchant,
       currency,
     },
-  })
+  });
 }
 
 /**

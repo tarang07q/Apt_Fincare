@@ -12,6 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
 import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group"
 import { Loader2 } from "lucide-react"
+import { sendTransactionAlert } from "../../lib/notifications"
 
 const formSchema = z.object({
   type: z.enum(["expense", "income"]),
@@ -127,6 +128,15 @@ export function AddTransactionForm({ onSuccess }: AddTransactionFormProps) {
         const errorData = await response.json()
         throw new Error(errorData.message || "Failed to add transaction")
       }
+
+      // Trigger notification
+      await sendTransactionAlert(
+        "user-id-placeholder", // Replace with actual user ID
+        values.type,
+        parseFloat(values.amount),
+        values.category,
+        "USD" // Replace with dynamic currency if available
+      )
 
       toast({
         title: "Success",
