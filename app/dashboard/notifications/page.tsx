@@ -9,87 +9,52 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui
 import { ThreeDIcon } from "../../../components/ui/3d-icon"
 import { Loader2 } from "lucide-react"
 
-// Mock notifications for demo purposes
-// In a real app, these would come from an API
-const mockNotifications = [
-  {
-    id: "1",
-    title: "Budget Alert",
-    message: "You've used 85% of your Groceries budget",
-    date: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
-    read: false,
-    type: "budget",
-  },
-  {
-    id: "2",
-    title: "Transaction Alert",
-    message: "New transaction: $45.99 at Amazon",
-    date: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
-    read: true,
-    type: "transaction",
-  },
-  {
-    id: "3",
-    title: "Account Activity",
-    message: "New login from Chrome on Windows",
-    date: new Date(Date.now() - 1000 * 60 * 60 * 48), // 2 days ago
-    read: true,
-    type: "account",
-  },
-  {
-    id: "4",
-    title: "Budget Alert",
-    message: "You've used 100% of your Entertainment budget",
-    date: new Date(Date.now() - 1000 * 60 * 60 * 72), // 3 days ago
-    read: true,
-    type: "budget",
-  },
-  {
-    id: "5",
-    title: "Transaction Alert",
-    message: "New transaction: $12.50 at Starbucks",
-    date: new Date(Date.now() - 1000 * 60 * 60 * 96), // 4 days ago
-    read: true,
-    type: "transaction",
-  },
-  {
-    id: "6",
-    title: "Weekly Report",
-    message: "Your weekly financial summary is ready",
-    date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7), // 1 week ago
-    read: true,
-    type: "report",
-  },
-]
-
 export default function NotificationsPage() {
   const { data: session, status } = useSession()
   const { theme } = useTheme()
-  const [notifications, setNotifications] = useState(mockNotifications)
+  const [notifications, setNotifications] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [activeTab, setActiveTab] = useState("all")
 
   useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
-
-    return () => clearTimeout(timer)
+    // Fetch notifications from API
+    const fetchNotifications = async () => {
+      setIsLoading(true)
+      try {
+        const res = await fetch("/api/notifications")
+        if (!res.ok) throw new Error("Failed to fetch notifications")
+        const data = await res.json()
+        // Ensure date fields are Date objects
+        const notificationsWithDates = data.notifications.map((n: any) => ({
+          ...n,
+          date: new Date(n.date),
+        }))
+        setNotifications(notificationsWithDates)
+      } catch (error) {
+        setNotifications([])
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchNotifications()
   }, [])
 
-  const markAsRead = (id: string) => {
+  const markAsRead = async (id: string) => {
     setNotifications((prev) =>
       prev.map((notification) =>
         notification.id === id ? { ...notification, read: true } : notification
       )
     )
+    // Optionally, update on server:
+    await fetch(`/api/notifications/${id}/read`, { method: "POST" })
   }
 
-  const markAllAsRead = () => {
+  const markAllAsRead = async () => {
     setNotifications((prev) =>
       prev.map((notification) => ({ ...notification, read: true }))
     )
+    // Optionally, update on server:
+    await fetch(`/api/notifications/mark-all-read`, { method: "POST" })
   }
 
   const formatDate = (date: Date) => {
