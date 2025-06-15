@@ -1,5 +1,7 @@
 # Apt_Fincare - Personal Finance Management System
 
+![Finance GIF](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNjBlZWt5dW5rNTFuNHY5aG9vdzJxYTdkeTV3emhhOTNjc3dndnJmayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3o7btPCcdNniyf0ArS/giphy.gif)
+
 ## Overview
 Apt_Fincare is a comprehensive personal finance management system built with Next.js, MongoDB, and modern web technologies. It helps users track expenses, manage budgets, and gain insights into their financial health.
 
