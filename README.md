@@ -3,7 +3,9 @@
 ## Overview
 Apt_Fincare is a comprehensive personal finance management system built with Next.js, MongoDB, and modern web technologies. It helps users track expenses, manage budgets, and gain insights into their financial health.
 
-![Dashboard Overview](https://github.com/user-attachments/assets/f8dcaa10-8ab2-4e5d-8b12-d98c0ea63d15)
+
+![image](https://github.com/user-attachments/assets/cd8bf841-cfe4-4beb-bd84-0e74aea3bccb)
+
 
 ## Key Features
 
@@ -20,7 +22,7 @@ Apt_Fincare is a comprehensive personal finance management system built with Nex
 - Track budget progress with rollover support
 - Flexible period-based budgeting (Daily/Weekly/Monthly/Quarterly/Yearly)
 
-![Transaction Interface](https://github.com/user-attachments/assets/bfd30132-9500-480f-bc91-9230c1698c76)
+![image](https://github.com/user-attachments/assets/ff7229ef-7c9d-4d2c-bd91-e603ac4a9fcf)
 
 
 ### 3. Transaction Tracking
@@ -28,8 +30,9 @@ Apt_Fincare is a comprehensive personal finance management system built with Nex
 - Organize transactions by categories
 - Detailed transaction history
 - Multiple payment method support
-- 
-![Authentication Interface](https://github.com/user-attachments/assets/cb479214-7fb6-4fb4-801e-a1d2a19f8dce)
+  
+![image](https://github.com/user-attachments/assets/94a55e2f-4b5e-4b73-82aa-80f33cabba32)
+
 
 
 ### 4. Analytics & Reporting
@@ -38,7 +41,9 @@ Apt_Fincare is a comprehensive personal finance management system built with Nex
 - Spending trend visualization
 - Customizable financial reports
 
-![Budget Management](https://github.com/user-attachments/assets/294bcfc4-84f7-4ec7-adfd-0057249dbf91)
+![image](https://github.com/user-attachments/assets/eccdd1df-2584-436c-ba50-3d29fa694296)
+
+![image](https://github.com/user-attachments/assets/91d37083-7ddb-42fe-90c8-524680d8f176)
 
 
 ### 5. Dashboard & Overview
@@ -47,7 +52,8 @@ Apt_Fincare is a comprehensive personal finance management system built with Nex
 - Recent transaction display
 - Alert notifications system
 
-![Analytics Dashboard](https://github.com/user-attachments/assets/69ad3abc-ebf0-4cf6-8238-5c61d77f37a7)
+![image](https://github.com/user-attachments/assets/f30615b5-94ee-4dab-831a-1fbcae1a2166)
+
 
 ## Tech Stack
 - **Frontend**: Next.js, TailwindCSS
@@ -61,13 +67,35 @@ Apt_Fincare is a comprehensive personal finance management system built with Nex
 apt_fincare/
 ├── app/
 │   ├── api/
-│   │   └── auth/
+│   │   ├── auth/
+│   │   │   ├── [...nextauth]/
+│   │   │   │   └── route.ts
+│   │   │   ├── login-notification/
+│   │   │   │   └── route.ts
+│   │   │   └── register/
+│   │   │       └── route.ts
+│   │   └── notifications/
+│   │       └── route.ts
 │   ├── dashboard/
 │   │   ├── transactions/
+│   │   │   └── page.tsx
 │   │   ├── budgets/
-│   │   └── analytics/
+│   │   │   └── page.tsx
+│   │   ├── analytics/
+│   │   │   └── page.tsx
+│   │   └── notifications/
+│   │       └── page.tsx
 │   ├── globals.css
-│   └── layout.tsx
+│   ├── layout.tsx
+│   ├── page.tsx
+│   ├── about/
+│   │   └── page.tsx
+│   ├── login/
+│   │   └── page.tsx
+│   ├── register/
+│   │   └── page.tsx
+│   └── forgot-password/
+│       └── page.tsx
 ├── components/
 │   ├── ui/
 │   │   ├── buttons/
@@ -75,13 +103,25 @@ apt_fincare/
 │   │   └── cards/
 │   ├── auth-provider.tsx
 │   ├── currency-provider.tsx
-│   └── theme-provider.tsx
+│   ├── theme-provider.tsx
+│   └── ... (other components)
 ├── lib/
 │   ├── utils/
-│   └── hooks/
+│   │   └── ... (utility files)
+│   ├── hooks/
+│   │   └── ... (custom hooks)
+│   └── mongodb.ts
+├── models/
+│   ├── user.ts
+│   ├── notification.ts
+│   ├── transaction.ts
+│   ├── budget.ts
+│   └── category.ts
 ├── public/
 │   ├── images/
 │   └── icons/
+├── scripts/
+│   └── ... (build or utility scripts)
 ├── styles/
 │   └── globals.css
 ├── types/
@@ -165,12 +205,10 @@ yarn dev
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## License
-This project is licensed under the MIT License - see the LICENSE file for details
 
 ## Contact
 Tarang Bhargava - [tarangbhargava09@gmail.com](mailto:tarangbhargava09@gmail.com)
-Project Link: [https://github.com/tarang07q/Apt_Fincare](https://github.com/tarang07q/Apt_Fincare)
+Project Link: https://apt-fincare-4k4w.vercel.app/
 
 ## Acknowledgments
 - Next.js Documentation
